@@ -1,5 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import {
+  corsHeaders,
+  getAdminClient,
+  requireAuth,
+  STAFF_PERFIS,
+} from "../_shared/auth.ts";
 
 interface EmailPayload {
   tipo: 'confirmacao' | 'aprovacao' | 'rejeicao' | 'novo_agendamento';
@@ -13,11 +18,6 @@ interface EmailPayload {
     motivo?: string;
   };
 }
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 function getEmailTemplate(payload: EmailPayload): { subject: string; html: string } {
   const { tipo, nome_destino, dados } = payload;
@@ -146,10 +146,17 @@ serve(async (req) => {
       return new Response("ok", { headers: corsHeaders });
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    // Exige JWT válido do caller
+    const { user, supabaseUser } = await requireAuth(req);
+
+    // Staff pode enviar para qualquer destino; cidadão só para o próprio e-mail
+    const { data: perfilRow } = await supabaseUser
+      .from("usuarios")
+      .select("perfil")
+      .eq("auth_uid", user.id)
+      .maybeSingle();
+
+    const isStaff = !!perfilRow && STAFF_PERFIS.includes(perfilRow.perfil);
 
     const payload: EmailPayload = await req.json();
 
@@ -160,8 +167,16 @@ serve(async (req) => {
       );
     }
 
+    if (!isStaff && payload.email_destino !== user.email) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: envio apenas para o próprio e-mail" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { subject, html } = getEmailTemplate(payload);
 
+    const supabaseAdmin = getAdminClient();
     const { error: insertError } = await supabaseAdmin.from("email_queue").insert({
       destinatario: payload.email_destino,
       nome_destinatario: payload.nome_destino,
@@ -185,10 +200,11 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    if (error instanceof Response) return error;
     console.error("Function error:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
+      JSON.stringify({ error: String(error) }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });

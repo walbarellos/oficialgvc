@@ -1,48 +1,45 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-interface AuditPayload {
-  acao: string;
-  detalhes: string;
-  entidade_id: string | null;
-  usuario: string;
-  perfil: string;
-  usuario_id: string | null;
-}
+import {
+  corsHeaders,
+  getAdminClient,
+  requireAuth,
+  STAFF_PERFIS,
+} from "../_shared/auth.ts";
 
 serve(async (req) => {
   try {
-    const corsHeaders = {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    };
-
     if (req.method === "OPTIONS") {
       return new Response("ok", { headers: corsHeaders });
     }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing authorization" }), {
-        status: 401,
+    // Exige JWT válido do caller
+    const { user, supabaseUser } = await requireAuth(req);
+
+    // Verificar perfil staff na tabela usuarios (via cliente do próprio usuário)
+    const { data: perfilRow } = await supabaseUser
+      .from("usuarios")
+      .select("perfil, nome")
+      .eq("auth_uid", user.id)
+      .maybeSingle();
+
+    if (!perfilRow || !STAFF_PERFIS.includes(perfilRow.perfil)) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseAdmin = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-    );
+    const payload = await req.json();
 
-    const payload: AuditPayload = await req.json();
-
+    // Sobrescrever identidade com dados do token — nunca confiar no client
+    const supabaseAdmin = getAdminClient();
     const { error: insertError } = await supabaseAdmin.from("auditoria").insert({
       acao: payload.acao,
       detalhes: payload.detalhes,
-      entidade_id: payload.entidade_id,
-      usuario: payload.usuario,
-      perfil: payload.perfil,
-      usuario_id: payload.usuario_id,
+      entidade_id: payload.entidade_id ?? null,
+      usuario: perfilRow.nome,
+      perfil: perfilRow.perfil,
+      usuario_id: user.id,
     });
 
     if (insertError) {
@@ -57,10 +54,11 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
+    if (error instanceof Response) return error;
     console.error("Function error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: String(error) }), {
       status: 500,
-      headers: { "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

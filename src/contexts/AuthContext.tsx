@@ -113,28 +113,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setSpaceConfig(null);
           }
         } else {
-          // Check if user is a public user (from public registration)
-          // If not found in usuarios table, check if it's a public auth user
-          const userEmail = session.user.email || '';
-          const isPublicUser = userEmail.includes('@') && 
-            !userEmail.endsWith('@cultura.gov.br');
-          
-          if (isPublicUser) {
-            // Treat as citizen/public user - set as null so App.tsx redirects to public area
-            setUserData(null);
-            setSpaceConfig(null);
-          } else {
-            // Internal user fallback
-            setUserData({
-              id: session.user.id,
-              nome: session.user.email?.split('@')[0] || 'Usuário',
-              email: session.user.email || '',
-              perfil: 'funcionario',
-              espacoId: 'desconhecido',
-              espacoNome: 'Sem vínculo',
-              ativo: true
-            });
-          }
+          // Usuário autenticado no Supabase Auth, mas sem registro em `usuarios`.
+          // NUNCA promover a funcionário por domínio de e-mail.
+          // Cidadão/público → null (App redireciona para área pública).
+          setUserData(null);
+          setSpaceConfig(null);
         }
         setLoading(false);
       } else {

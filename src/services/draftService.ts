@@ -41,7 +41,7 @@ const SESSION_KEY = 'gvc_session_id';
 function getSessionId(): string {
   let sessionId = sessionStorage.getItem(SESSION_KEY);
   if (!sessionId) {
-    sessionId = 'gvc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    sessionId = crypto.randomUUID();
     sessionStorage.setItem(SESSION_KEY, sessionId);
   }
   return sessionId;
