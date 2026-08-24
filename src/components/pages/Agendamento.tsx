@@ -162,20 +162,36 @@ export default function Agendamento() {
     const { error } = await updateStatus(id, status, resposta);
     if (!error) {
       refetch();
-      const supabaseFn = supabase.functions.invoke('send-agendamento-email', {
-        body: JSON.stringify({
-          tipo: status === 'aprovado' ? 'aprovacao' : 'rejeicao',
-          email_destino: selectedAgendamento?.solicitante_email,
-          nome_destino: selectedAgendamento?.solicitante_nome,
-          agendamento_id: id,
-          dados: {
-            espaco: selectedAgendamento?.espaco_solicitado,
-            data: formatDate(selectedAgendamento?.data_pretendida || ''),
-            horario: `${formatTime(selectedAgendamento?.horario_inicio || '')} - ${formatTime(selectedAgendamento?.horario_fim || '')}`,
-            motivo: resposta,
-          },
-        }),
+      
+      // Registrar na auditoria
+      await auditService.log({
+        acao: `${status}_agendamento`,
+        detalhes: `Agendamento ${status} para ${selectedAgendamento?.solicitante_nome}. ${resposta ? 'Motivo: ' + resposta : ''}`,
+        entidadeId: id
       });
+
+      try {
+        const { error: emailError } = await supabase.functions.invoke('send-agendamento-email', {
+          body: JSON.stringify({
+            tipo: status === 'aprovado' ? 'aprovacao' : 'rejeicao',
+            email_destino: selectedAgendamento?.solicitante_email,
+            nome_destino: selectedAgendamento?.solicitante_nome,
+            agendamento_id: id,
+            dados: {
+              espaco: selectedAgendamento?.espaco_solicitado,
+              data: formatDate(selectedAgendamento?.data_pretendida || ''),
+              horario: `${formatTime(selectedAgendamento?.horario_inicio || '')} - ${formatTime(selectedAgendamento?.horario_fim || '')}`,
+              motivo: resposta,
+            },
+          }),
+        });
+        if (emailError) throw emailError;
+      } catch (emailErr: any) {
+        console.error('Erro ao enviar email de status:', emailErr);
+        alert('Status atualizado, mas houve um erro ao enviar o email de notificação.');
+      }
+    } else {
+      alert('Erro ao atualizar status: ' + error.message);
     }
     setSelectedAgendamento(null);
   };
@@ -192,7 +208,11 @@ export default function Agendamento() {
     
     if (!error) {
       refetch();
-      setSelectedAgendamento(null);
+      await auditService.log({
+        acao: 'exclusao_agendamento',
+        detalhes: `Agendamento ${id} excluído definitivamente.`,
+        entidadeId: id
+      });
     } else {
       alert('Erro ao excluir agendamento: ' + error.message);
     }

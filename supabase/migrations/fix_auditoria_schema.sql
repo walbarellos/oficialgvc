@@ -1,1 +1,0 @@
-ALTER TABLE auditoria ADD COLUMN IF NOT EXISTS usuario_id UUID;
