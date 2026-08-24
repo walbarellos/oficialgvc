@@ -640,9 +640,27 @@ CREATE POLICY "Admin can delete visitors" ON visitors FOR DELETE TO authenticate
 
 -- USUARIOS
 ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can read themselves" ON usuarios FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Users can read themselves" ON usuarios FOR SELECT TO authenticated USING (
+    auth_uid = auth.uid()
+);
 CREATE POLICY "Admin can manage usuarios" ON usuarios FOR ALL TO authenticated USING (
-    (SELECT perfil FROM usuarios WHERE auth_uid = auth.uid()) = 'administrador'
+    -- Para evitar recursão infinita no SELECT, checamos via JWT ou executamos a verificação sem disparar RLS extra.
+    -- O jeito mais seguro no Supabase é ler do JWT se houver custom claims, ou depender da policy base para o admin ler a si próprio.
+    -- Se o admin quer ler *os outros*, a subquery precisa ser escrita de forma a não gerar loop.
+    auth_uid = auth.uid() -- garante pelo menos edição do próprio perfil
+);
+-- Usamos uma função SECURITY DEFINER para verificar se é admin, o que bypassa RLS e evita recursão.
+CREATE OR REPLACE FUNCTION is_admin() RETURNS BOOLEAN AS $
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM usuarios
+    WHERE auth_uid = auth.uid() AND perfil = 'administrador'
+  );
+END;
+$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Admins can view and edit everyone" ON usuarios FOR ALL TO authenticated USING (
+    is_admin()
 );
 
 -- ESPACOS
