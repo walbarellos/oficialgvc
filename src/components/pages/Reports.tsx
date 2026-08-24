@@ -831,7 +831,7 @@ export default function Reports() {
               Nenhum dado disponível
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={1}>
               <PieChart>
                 <Pie
                   data={genderData}
@@ -867,7 +867,7 @@ export default function Reports() {
               Nenhum dado disponível
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={300} minWidth={1} minHeight={1}>
               <BarChart data={ageData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis 
