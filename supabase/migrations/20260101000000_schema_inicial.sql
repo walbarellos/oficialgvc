@@ -194,6 +194,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
 CREATE TABLE IF NOT EXISTS agendamentos_rascunho (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     CONSTRAINT agendamentos_rascunho_session_id_key UNIQUE (session_id),
+    auth_uid UUID DEFAULT auth.uid(),
     session_id TEXT NOT NULL,
     solicitante_nome TEXT,
     solicitante_email TEXT,
@@ -374,7 +375,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF OLD IS NOT NULL AND OLD.status IS DISTINCT FROM NEW.status THEN
         INSERT INTO log_agendamentos (agendamento_id, acao, usuario_id, dados_anteriores, dados_novos)
-        VALUES (
+        VALUES (auth.uid(), 
             NEW.id,
             CASE
                 WHEN NEW.status = 'aprovado' THEN 'aprovacao'
@@ -511,7 +512,7 @@ BEGIN
     RETURNING id INTO v_id;
   ELSE
     -- Criar novo
-    INSERT INTO agendamentos_rascunho (
+    INSERT INTO agendamentos_rascunho (auth_uid, 
       session_id,
       solicitante_nome,
       solicitante_email,
@@ -760,7 +761,7 @@ CREATE POLICY "Staff can manage computers" ON computadores FOR ALL TO authentica
 
 -- AGENDAMENTOS_RASCUNHO
 ALTER TABLE agendamentos_rascunho ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Session can manage draft" ON agendamentos_rascunho FOR ALL USING (true);
+CREATE POLICY "Session can manage draft" ON agendamentos_rascunho FOR ALL USING (auth_uid = auth.uid()) WITH CHECK (auth_uid = auth.uid());
 
 -- ====================================================================
 -- FIM DO SCRIPT DE MIGRAÇÃO
