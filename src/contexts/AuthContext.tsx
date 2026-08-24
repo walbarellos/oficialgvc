@@ -75,22 +75,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } as SystemUser;
           setUserData(formattedUser);
 
-          // Realtime user updates
-          // userSubscription = supabase.channel('user-updates')
-          //   .on('postgres_changes', { event: '*', schema: 'public', table: 'usuarios', filter: `auth_uid=eq.${session.user.id}` }, payload => {
-          //     if (payload.new) {
-          //       setUserData({
-          //         id: payload.new.id,
-          //         nome: payload.new.nome,
-          //         email: payload.new.email,
-          //         perfil: payload.new.perfil,
-          //         espacoId: payload.new.espaco_id || null,
-          //         espacoNome: payload.new.espaco_nome,
-          //         ativo: payload.new.ativo
-          //       } as SystemUser);
-          //     }
-          //   }).subscribe();
-
           if (formattedUser.espacoId && formattedUser.espacoId !== 'todos' && formattedUser.espacoId !== 'desconhecido') {
             const { data: sData } = await supabase
               .from('espacos')

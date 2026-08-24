@@ -34,7 +34,7 @@ export default function Dashboard() {
     if (!userData) return;
     
     const isGlobalAdmin = userData.perfil === 'administrador' && 
-      (!userData.espacoId || userData.espacoId === 'todos' || userData.espacoId === 'todos');
+      (!userData.espacoId || userData.espacoId === 'todos');
 
     try {
       const today = new Date();

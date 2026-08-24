@@ -734,9 +734,6 @@ export default function Reports() {
                       </td>
                       <td className="px-6 py-4 text-right no-print">
                          <div className="flex justify-end gap-2">
-                            <button className="text-gray-400 hover:text-primary transition-colors p-2 hover:bg-gray-100 rounded-lg">
-                              <Download size={16} />
-                            </button>
                             <button 
                               onClick={() => handleDelete(visit)}
                               className="text-gray-400 hover:text-red-500 transition-colors p-2 hover:bg-red-50 rounded-lg"

@@ -316,13 +316,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
 
             <div className="w-full md:w-80 bg-slate-50 border-l border-slate-100 p-8 flex flex-col">
               <div className="flex-1 space-y-6">
-                <div>
-                  <div className="w-full aspect-square rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:bg-white hover:border-primary hover:text-primary transition-all cursor-pointer group mb-4">
-                    <Camera size={40} className="mb-2" />
-                    <span className="text-[10px] font-bold uppercase tracking-widest">Enviar Foto</span>
-                  </div>
-                  <p className="text-[10px] text-slate-400 text-center uppercase tracking-tighter">Foto frontal recomendada para impressão de crachá</p>
-                </div>
+
 
                 <div>
                   <h3 className="flex items-center gap-2 font-bold uppercase text-[10px] tracking-widest text-primary mb-4">Classificação</h3>

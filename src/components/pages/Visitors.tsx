@@ -405,10 +405,7 @@ const mapped = data.map(d => ({
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-500">Mostrando {filteredVisitors.length} resultados</span>
-            <div className="flex items-center border border-gray-200 rounded overflow-hidden">
-              <button className="p-1.5 hover:bg-gray-50 border-r border-gray-200 disabled:opacity-30" disabled><ChevronLeft size={16} /></button>
-              <button className="p-1.5 hover:bg-gray-50 disabled:opacity-30" disabled><ChevronRight size={16} /></button>
-            </div>
+            
           </div>
         </div>
 
