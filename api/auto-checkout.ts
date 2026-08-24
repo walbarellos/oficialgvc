@@ -1,10 +1,21 @@
-export const dynamic = 'force-dynamic';
+export const config = {
+  runtime: 'edge',
+};
 
-export async function GET() {
+export default async function request(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) {
     return new Response(JSON.stringify({ error: 'CRON_SECRET not configured' }), {
       status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+
+  // Verificar se a requisição veio do Vercel Cron
+  const authHeader = req.headers.get('authorization');
+  if (authHeader !== `Bearer ${cronSecret}` && req.headers.get('x-cron-secret') !== cronSecret) {
+    return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      status: 401,
       headers: { 'Content-Type': 'application/json' }
     });
   }
@@ -16,7 +27,7 @@ export async function GET() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-cron-secret': cronSecret,
+          'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`
         }
       }
     );
