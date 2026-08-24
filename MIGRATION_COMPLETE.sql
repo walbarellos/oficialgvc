@@ -353,7 +353,7 @@ BEGIN
             OR (horario_inicio >= p_inicio AND horario_fim <= p_fim)
         )
         AND (p_exclude_id IS NULL OR id != p_exclude_id);
-    RETURN conflicto_count > 0;
+    RETURN conflito_count > 0;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -580,18 +580,41 @@ CREATE POLICY "Staff can manage visits" ON visits FOR ALL TO authenticated USING
 
 -- AGENDAMENTOS
 ALTER TABLE agendamentos ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Agendamentos view own" ON agendamentos FOR SELECT USING (
+
+DROP POLICY IF EXISTS "agendamentos_view_own" ON agendamentos;
+CREATE POLICY "agendamentos_view_own" ON agendamentos FOR SELECT USING (
     auth_uid = auth.uid()
     OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario', 'monitor'))
     OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil = 'administrador')
 );
-CREATE POLICY "Agendamentos insert own" ON agendamentos FOR INSERT WITH CHECK (
+
+DROP POLICY IF EXISTS "agendamentos_insert_own" ON agendamentos;
+CREATE POLICY "agendamentos_insert_own" ON agendamentos FOR INSERT WITH CHECK (
     auth_uid = auth.uid()
-    OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil IN ('administrador', 'coordenador'))
+    OR EXISTS (
+      SELECT 1 FROM usuarios
+      WHERE auth_uid = auth.uid()
+      AND (
+        (espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario'))
+        OR perfil = 'administrador'
+      )
+    )
 );
-CREATE POLICY "Agendamentos update coordinator" ON agendamentos FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'administrador'))
+
+DROP POLICY IF EXISTS "agendamentos_update_coordenador" ON agendamentos;
+CREATE POLICY "agendamentos_update_coordenador" ON agendamentos FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM usuarios
+      WHERE auth_uid = auth.uid()
+      AND (
+        (espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario'))
+        OR perfil = 'administrador'
+      )
+    )
 );
+
+DROP POLICY IF EXISTS "Coordenadores_INSERT" ON agendamentos;
+DROP POLICY IF EXISTS "Admin_ALL" ON agendamentos;
 
 -- ASSINATURAS DIGITAIS
 ALTER TABLE assinaturas_digitais ENABLE ROW LEVEL SECURITY;
