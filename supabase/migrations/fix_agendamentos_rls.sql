@@ -18,7 +18,7 @@ CREATE POLICY "agendamentos_view_own" ON agendamentos
   FOR SELECT
   USING (
     -- Regra 1: Cidadão vê apenas seus próprios agendamentos
-    solicitante_email = auth.jwt()->>'email'
+    auth_uid = auth.uid()
     
     -- Regra 2: Funcionários/Coordenadores veem agendamentos do seu espaço
     OR EXISTS (
@@ -45,12 +45,15 @@ CREATE POLICY "agendamentos_insert_own" ON agendamentos
   FOR INSERT
   WITH CHECK (
     -- Cidadão pode criar seu próprio agendamento
-    solicitante_email = auth.jwt()->>'email'
+    auth_uid = auth.uid()
     -- Ou admin/coordenador
     OR EXISTS (
       SELECT 1 FROM usuarios
       WHERE auth_uid = auth.uid()
-      AND perfil IN ('administrador', 'coordenador')
+      AND (
+        (espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario'))
+        OR perfil = 'administrador'
+      )
     )
   );
 
@@ -66,8 +69,10 @@ CREATE POLICY "agendamentos_update_coordenador" ON agendamentos
     EXISTS (
       SELECT 1 FROM usuarios
       WHERE auth_uid = auth.uid()
-      AND espaco_id = agendamentos.espaco_id
-      AND perfil IN ('coordenador', 'administrador')
+      AND (
+        (espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario'))
+        OR perfil = 'administrador'
+      )
     )
   )
   WITH CHECK (
@@ -75,8 +80,10 @@ CREATE POLICY "agendamentos_update_coordenador" ON agendamentos
     EXISTS (
       SELECT 1 FROM usuarios
       WHERE auth_uid = auth.uid()
-      AND espaco_id = agendamentos.espaco_id
-      AND perfil IN ('coordenador', 'administrador')
+      AND (
+        (espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario'))
+        OR perfil = 'administrador'
+      )
     )
   );
 

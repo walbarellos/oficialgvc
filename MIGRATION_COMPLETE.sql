@@ -141,6 +141,7 @@ CREATE TABLE IF NOT EXISTS configuracoes (
 CREATE TABLE IF NOT EXISTS agendamentos (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     espaco_id UUID REFERENCES espacos(id),
+    auth_uid UUID, -- ID do usuário logado que criou o agendamento (se houver)
     solicitante_nome TEXT NOT NULL,
     solicitante_email TEXT NOT NULL,
     solicitante_telefone TEXT NOT NULL,
@@ -580,12 +581,12 @@ CREATE POLICY "Staff can manage visits" ON visits FOR ALL TO authenticated USING
 -- AGENDAMENTOS
 ALTER TABLE agendamentos ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Agendamentos view own" ON agendamentos FOR SELECT USING (
-    solicitante_email = auth.jwt()->>'email'
+    auth_uid = auth.uid()
     OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND espaco_id = agendamentos.espaco_id AND perfil IN ('coordenador', 'funcionario', 'monitor'))
     OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil = 'administrador')
 );
 CREATE POLICY "Agendamentos insert own" ON agendamentos FOR INSERT WITH CHECK (
-    solicitante_email = auth.jwt()->>'email'
+    auth_uid = auth.uid()
     OR EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil IN ('administrador', 'coordenador'))
 );
 CREATE POLICY "Agendamentos update coordinator" ON agendamentos FOR UPDATE USING (

@@ -23,6 +23,14 @@ serve(async (req) => {
     const realIP = req.headers.get('x-real-ip')
     const clientIP = forwardedFor?.split(',')[0]?.trim() || cfIP || realIP || 'unknown'
     
+    let clientAuthUid = null;
+    const authHeader = req.headers.get('Authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const { data: { user } } = await supabaseAdmin.auth.getUser(token);
+      if (user) clientAuthUid = user.id;
+    }
+
     const agendamento = await req.json()
     
     // Se o frontend não enviou IP, usar o capturado
@@ -105,6 +113,7 @@ serve(async (req) => {
     const { data, error } = await supabaseAdmin
       .from('agendamentos')
       .insert({
+        auth_uid: clientAuthUid,
         espaco_id: agendamento.espaco_id,
         solicitante_nome: agendamento.solicitante_nome,
         solicitante_email: agendamento.solicitante_email,
