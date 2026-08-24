@@ -698,7 +698,11 @@ DROP POLICY IF EXISTS "Admin_ALL" ON agendamentos;
 
 -- ASSINATURAS DIGITAIS
 ALTER TABLE assinaturas_digitais ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Admin total access assinaturas" ON assinaturas_digitais FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Admin total access assinaturas" ON assinaturas_digitais FOR ALL TO authenticated USING (
+    EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil = 'administrador')
+) WITH CHECK (
+    EXISTS (SELECT 1 FROM usuarios WHERE auth_uid = auth.uid() AND perfil = 'administrador')
+);
 
 -- AUDITORIA
 ALTER TABLE auditoria ENABLE ROW LEVEL SECURITY;
