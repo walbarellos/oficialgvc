@@ -22,7 +22,7 @@ CREATE POLICY "Staff can insert visitors" ON visitors
   FOR INSERT
   TO authenticated
   WITH CHECK (
-    (SELECT perfil FROM usuarios WHERE id = auth.uid()) IN ('administrador', 'coordenador', 'funcionario', 'monitor')
+    (SELECT perfil FROM usuarios WHERE auth_uid = auth.uid()) IN ('administrador', 'coordenador', 'funcionario', 'monitor')
   );
 
 -- 4. UPDATE - Administradores E Coordenadores/Funcionarios/Monitores
@@ -30,7 +30,7 @@ CREATE POLICY "Staff can update visitors" ON visitors
   FOR UPDATE
   TO authenticated
   USING (
-    (SELECT perfil FROM usuarios WHERE id = auth.uid()) IN ('administrador', 'coordenador', 'funcionario', 'monitor')
+    (SELECT perfil FROM usuarios WHERE auth_uid = auth.uid()) IN ('administrador', 'coordenador', 'funcionario', 'monitor')
   );
 
 -- 5. DELETE - APENAS Administradores
@@ -38,5 +38,5 @@ CREATE POLICY "Admin can delete visitors" ON visitors
   FOR DELETE
   TO authenticated
   USING (
-    (SELECT perfil FROM usuarios WHERE id = auth.uid()) = 'administrador'
+    (SELECT perfil FROM usuarios WHERE auth_uid = auth.uid()) = 'administrador'
   );

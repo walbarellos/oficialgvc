@@ -127,12 +127,12 @@ CREATE POLICY "agendamentos_view_own" ON agendamentos FOR SELECT
       WHERE espaco_id IN (
         SELECT coalesce(espaco_id::text, 'todos') 
         FROM auth.users 
-        WHERE id = auth.uid()
+        WHERE auth_uid = auth.uid()
       )
     )
     OR EXISTS (
       SELECT 1 FROM auth.users 
-      WHERE id = auth.uid() 
+      WHERE auth_uid = auth.uid() 
       AND (perfil = 'administrador' OR perfil = 'coordenador')
     )
   );
@@ -143,7 +143,7 @@ CREATE POLICY "agendamentos_insert_own" ON agendamentos FOR INSERT
     solicitante_email = auth.jwt()->>'email'
     OR EXISTS (
       SELECT 1 FROM auth.users 
-      WHERE id = auth.uid() 
+      WHERE auth_uid = auth.uid() 
       AND (perfil = 'administrador' OR perfil = 'coordenador')
     )
   );
@@ -153,14 +153,14 @@ CREATE POLICY "agendamentos_update_coordenador" ON agendamentos FOR UPDATE
   USING (
     EXISTS (
       SELECT 1 FROM auth.users 
-      WHERE id = auth.uid() 
+      WHERE auth_uid = auth.uid() 
       AND (perfil = 'administrador' OR perfil = 'coordenador')
     )
   )
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM auth.users 
-      WHERE id = auth.uid() 
+      WHERE auth_uid = auth.uid() 
       AND (perfil = 'administrador' OR perfil = 'coordenador')
     )
   );
@@ -177,7 +177,7 @@ CREATE POLICY "documentos_view_agendamento" ON documentos_agendamento FOR SELECT
     )
     OR EXISTS (
       SELECT 1 FROM auth.users 
-      WHERE id = auth.uid() 
+      WHERE auth_uid = auth.uid() 
       AND (perfil = 'administrador' OR perfil = 'coordenador')
     )
   );
