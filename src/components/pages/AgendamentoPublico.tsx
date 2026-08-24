@@ -540,7 +540,7 @@ try {
       const selectedSpace = spaces.find((s) => s.id === formData.espaco_id);
 
       // Validar CPF na Receita Federal
-      if (formData.tipo_solicitante === 'cpf' && cpfDoc.length === 11) {
+      if (formData.tipo_solicitante === 'pessoa_fisica' && cpfDoc.length === 11) {
         cpfValidation = await validateCPFReceita(cpfDoc);
         if (!cpfValidation.valid) {
           setError(`CPF inválido: ${cpfValidation.message}. Verifique e tente novamente.`);
@@ -557,7 +557,7 @@ try {
           valor_ingresso: formData.gratuito ? null : parseFloat(formData.valor_ingresso) || null,
           session_id: draftService.getSessionId(),
           browser_fingerprint: assinaturaInfo?.fingerprint || null,
-          cpf_validado: formData.tipo_solicitante === 'cpf' ? cpfValidation?.valid : null,
+          cpf_validado: formData.tipo_solicitante === 'pessoa_fisica' ? cpfValidation?.valid : null,
           cpf_status: cpfValidation?.status || null,
         }
       });
