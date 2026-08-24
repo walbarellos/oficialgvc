@@ -8,19 +8,21 @@ import { PublicAuthProvider } from './contexts/PublicAuthContext';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
+import { Suspense, lazy } from 'react';
+
 // Pages
-import Dashboard from './components/pages/Dashboard';
-import Visitors from './components/pages/Visitors';
-import Lockers from './components/pages/Lockers';
-import Telecentro from './components/pages/Telecentro';
-import Agendamento from './components/pages/Agendamento';
-import AgendamentoPublico from './components/pages/AgendamentoPublico';
-import Reports from './components/pages/Reports';
-import SettingsPage from './components/pages/Settings';
-import Login from './components/pages/Login';
-import LoginPublico from './components/pages/LoginPublico';
-import CadastroPublico from './components/pages/CadastroPublico';
-import TermoCompromisso from './components/pages/TermoCompromisso';
+const Dashboard = lazy(() => import('./components/pages/Dashboard'));
+const Visitors = lazy(() => import('./components/pages/Visitors'));
+const Lockers = lazy(() => import('./components/pages/Lockers'));
+const Telecentro = lazy(() => import('./components/pages/Telecentro'));
+const Agendamento = lazy(() => import('./components/pages/Agendamento'));
+const AgendamentoPublico = lazy(() => import('./components/pages/AgendamentoPublico'));
+const Reports = lazy(() => import('./components/pages/Reports'));
+const SettingsPage = lazy(() => import('./components/pages/Settings'));
+const Login = lazy(() => import('./components/pages/Login'));
+const LoginPublico = lazy(() => import('./components/pages/LoginPublico'));
+const CadastroPublico = lazy(() => import('./components/pages/CadastroPublico'));
+const TermoCompromisso = lazy(() => import('./components/pages/TermoCompromisso'));
 
 // Components
 import CheckInModal from './components/modals/CheckInModal';
@@ -51,6 +53,7 @@ function InternalRoutes({ onNewCheckIn }: { onNewCheckIn: () => void }) {
         <Header />
         <main className="pt-16 min-h-[calc(100vh-64px)] relative">
           <AnimatePresence mode="wait">
+            <Suspense fallback={<div className="flex h-screen items-center justify-center bg-surface"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
               <Route path="/visitors" element={<ProtectedRoute><Visitors /></ProtectedRoute>} />
@@ -61,6 +64,7 @@ function InternalRoutes({ onNewCheckIn }: { onNewCheckIn: () => void }) {
               <Route path="/configuracoes" element={<ProtectedRoute requiredRole="administrador"><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
+          </Suspense>
           </AnimatePresence>
         </main>
       </div>
@@ -89,7 +93,8 @@ export default function App() {
     return (
       <PublicAuthProvider>
         <Router>
-          <Routes>
+          <Suspense fallback={<div className="flex h-screen items-center justify-center bg-surface"><div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div></div>}>
+            <Routes>
             <Route path="/gerenciamento" element={<Login />} />
             <Route path="/login" element={<Navigate to="/gerenciamento" replace />} />
             <Route path="/agendamento" element={<LoginPublico />} />
@@ -103,6 +108,7 @@ export default function App() {
             <Route path="/" element={<Navigate to="/gerenciamento" replace />} />
             <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
+          </Suspense>
         </Router>
       </PublicAuthProvider>
     );
