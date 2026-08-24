@@ -26,10 +26,7 @@ import { useCreateAgendamento } from '../../hooks/useAgendamentos';
 import { usePublicAuth } from '../../contexts/PublicAuthContext';
 import { validateCPF, validateCNPJ, formatCPF, formatCNPJ, formatPhone } from '../../lib/validators';
 import { draftService } from '../../services/draftService';
-import { getPublicIP } from '../../utils/network';
 import { getBrowserFingerprint } from '../../utils/browser';
-import { getLegalTimestamp } from '../../utils/datetime';
-import { generateDocumentHash } from '../../utils/crypto';
 import { validateCPFReceita } from '../../services/cpfService';
 
 interface FormData {
@@ -559,6 +556,9 @@ try {
           espaco_solicitado: selectedSpace?.nome || formData.espaco_solicitado,
           valor_ingresso: formData.gratuito ? null : parseFloat(formData.valor_ingresso) || null,
           session_id: draftService.getSessionId(),
+          browser_fingerprint: assinaturaInfo?.fingerprint || null,
+          cpf_validado: formData.tipo_solicitante === 'cpf' ? cpfValidation?.valid : null,
+          cpf_status: cpfValidation?.status || null,
         }
       });
 
@@ -595,36 +595,7 @@ try {
           console.error('Erro ao enviar email:', e);
         }
 
-        // Salvar assinatura digital blindada
-        if (data?.data?.id && assinaturaInfo) {
-          try {
-            const termoCompleto = JSON.stringify({
-              termo_compromisso: formData.termo_aceito,
-              responsabilidade_evento: formData.responsabhilidade_evento,
-              danos_patrimonio: formData.danos_patrimonio,
-              respeito_lotacao: formData.respeito_lotacao,
-            });
-            const termoHash = await generateDocumentHash(termoCompleto);
-
-            await supabase.from('assinaturas_digitais').insert({
-              visitor_id: null,
-              nome_assinante: formData.solicitante_nome,
-              cpf_assinante: cpfDoc,
-              tipo_documento: 'agendamento',
-              documento_id: data.data.id,
-              documento_hash: assinaturaInfo.hash,
-              ip_publico: assinaturaInfo.ip,
-              user_agent: navigator.userAgent,
-              browser_fingerprint: JSON.stringify(assinaturaInfo.fingerprint),
-              cpf_validado: formData.tipo_solicitante === 'cpf' ? cpfValidation?.valid : null,
-              cpf_status: cpfValidation?.status || null,
-              termo_conteudo: termoCompleto,
-              termo_hash: termoHash,
-            });
-          } catch (e) {
-            console.error('Erro ao salvar assinatura:', e);
-          }
-        }
+        // A assinatura digital agora é gerada com segurança 100% no servidor (Edge Function).
       }
 
       // Limpar rascunho local
@@ -1427,17 +1398,8 @@ try {
                         onChange={async (e) => {
                           updateFormData('termo_aceito', e.target.checked);
                           if (e.target.checked) {
-                            const [ip, fingerprint, timestamp] = await Promise.all([
-                              getPublicIP(),
-                              getBrowserFingerprint(),
-                              getLegalTimestamp(),
-                            ]);
-                            const hash = await generateDocumentHash(
-                              formData.solicitante_nome + formData.solicitante_documento + timestamp.iso
-                            );
-                            setAssinaturaInfo({ ip, fingerprint, timestamp: timestamp.brasilia, hash });
-                            updateFormData('termo_compromisso_data', timestamp.iso);
-                            updateFormData('termo_compromisso_ip', ip);
+                            const fingerprint = getBrowserFingerprint();
+                            setAssinaturaInfo({ fingerprint, hash: '', ip: '', timestamp: '' });
                           }
                         }}
                         className="mt-1 w-5 h-5 text-red-600 rounded focus:ring-red-500"

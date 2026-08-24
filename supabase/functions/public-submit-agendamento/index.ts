@@ -26,7 +26,7 @@ serve(async (req) => {
     const agendamento = await req.json()
     
     // Se o frontend não enviou IP, usar o capturado
-    const ipFinal = agendamento.termo_compromisso_ip || clientIP
+    const ipFinal = clientIP
     
     // Gerar ID único e timestamp para assinatura digital
     const assinaturaId = crypto.randomUUID()
@@ -34,6 +34,16 @@ serve(async (req) => {
     const hashUnico = crypto.randomUUID().split('-')[0].toUpperCase();
     const protocoloGerado = `GVC-${anoAtual}-${hashUnico}`;
     const assinaturaData = new Date().toISOString()
+
+    // Função auxiliar para gerar hash
+    const generateHash = async (text: string) => {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(text);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
+
 
     // Validar dados obrigatórios
     if (!agendamento.solicitante_nome || !agendamento.solicitante_email || !agendamento.espaco_id) {
@@ -99,6 +109,48 @@ serve(async (req) => {
         JSON.stringify({ error: error.message }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
+    }
+
+
+    // Inserir assinatura digital de forma segura no servidor
+    const termoCompleto = JSON.stringify({
+      termo_compromisso: agendamento.termo_aceito,
+      responsabilidade_evento: agendamento.responsabhilidade_evento,
+      danos_patrimonio: agendamento.danos_patrimonio,
+      respeito_lotacao: agendamento.respeito_lotacao,
+    });
+    
+    // O documento é a representação do agendamento
+    const documentoConteudo = JSON.stringify({
+      solicitante: agendamento.solicitante_nome,
+      documento: agendamento.solicitante_documento,
+      espaco: agendamento.espaco_solicitado,
+      data: agendamento.data_pretendida
+    });
+
+    const termoHash = await generateHash(termoCompleto);
+    const documentoHash = await generateHash(documentoConteudo);
+
+    const { error: signatureError } = await supabaseAdmin.from('assinaturas_digitais').insert({
+      id: assinaturaId,
+      visitor_id: null,
+      nome_assinante: agendamento.solicitante_nome,
+      cpf_assinante: agendamento.solicitante_documento,
+      tipo_documento: 'agendamento',
+      documento_id: data.id,
+      documento_hash: documentoHash,
+      ip_publico: clientIP,
+      user_agent: req.headers.get('user-agent') || 'unknown',
+      browser_fingerprint: JSON.stringify({ source: 'server-side', original: agendamento.browser_fingerprint }),
+      cpf_validado: agendamento.cpf_validado !== undefined ? agendamento.cpf_validado : null,
+      cpf_status: agendamento.cpf_status || null,
+      termo_conteudo: termoCompleto,
+      termo_hash: termoHash
+    });
+
+    if (signatureError) {
+      console.error('Erro ao inserir assinatura digital:', signatureError);
+      // Não falhar o agendamento por causa da assinatura, mas registrar
     }
 
     // Limpar rascunho após sucesso
