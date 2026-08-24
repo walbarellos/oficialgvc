@@ -28,6 +28,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (visitorToEdit) {
@@ -130,8 +131,8 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
         onClose();
         setFormData({ fullName: '', cpf: '', passport: '', isForeigner: false, gender: Gender.MALE, birthDate: '', email: '', phone: '', address: '', category: VisitorCategory.GENERAL });
       }, 2000);
-    } catch (error) {
-      handleFirestoreError(error, OperationType.WRITE, 'visitors');
+    } catch (error: any) {
+      setErrorMsg(error.message || String(error));
     } finally {
       setLoading(false);
     }
@@ -347,6 +348,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
 
               <div className="mt-8 pt-8 border-t border-slate-200">
                 <div className="flex flex-col gap-2">
+                  {errorMsg && <div className="text-red-500 text-xs font-bold text-center mb-2">{errorMsg}</div>}
                   <button
                     form="checkin-form"
                     type="submit"
