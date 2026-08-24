@@ -627,7 +627,19 @@ CREATE TRIGGER trigger_prevent_double_checkin
 
 -- VISITORS
 ALTER TABLE visitors ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "All authenticated can read visitors" ON visitors FOR SELECT TO authenticated USING (true);
+-- Usa a função SECURITY DEFINER is_staff para evitar recursão
+CREATE OR REPLACE FUNCTION is_staff() RETURNS BOOLEAN AS $
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM usuarios
+    WHERE auth_uid = auth.uid() AND perfil IN ('administrador', 'coordenador', 'funcionario', 'monitor')
+  );
+END;
+$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE POLICY "Staff can read visitors" ON visitors FOR SELECT TO authenticated USING (
+    is_staff()
+);
 CREATE POLICY "Staff can insert visitors" ON visitors FOR INSERT TO authenticated WITH CHECK (
     (SELECT perfil FROM usuarios WHERE auth_uid = auth.uid()) IN ('administrador', 'coordenador', 'funcionario', 'monitor')
 );
