@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Bell } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function NotificationBell() {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -106,7 +108,7 @@ export default function NotificationBell() {
                       else dateStr = date.toLocaleDateString('pt-BR');
                     }
                     
-                    const isSystemAlert = ['criar_espaco', 'editar_espaco', 'excluir_espaco', 'criar_usuario', 'editar_usuario', 'excluir_usuario', 'exportar_backup'].includes(notif.acao);
+                    const isSystemAlert = ['criou_espaco', 'editou_espaco', 'excluiu_espaco', 'criou_usuario', 'editou_usuario', 'excluiu_usuario', 'exportou_backup', 'alterou_configuracoes'].includes(notif.acao);
                     
                     return (
                       <div key={notif.id} className="p-4 hover:bg-slate-50 transition-colors">
@@ -131,7 +133,7 @@ export default function NotificationBell() {
               )}
             </div>
             <div className="p-3 border-t border-slate-50 bg-slate-50/50">
-               <button type="button" className="text-xs font-bold text-primary w-full text-center hover:text-blue-700 transition-colors">
+               <button type="button" onClick={() => navigate('/auditoria')} className="text-xs font-bold text-primary w-full text-center hover:text-blue-700 transition-colors">
                   Ver registro completo
                </button>
             </div>
