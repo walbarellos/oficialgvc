@@ -34,23 +34,7 @@ export const validateCPFReceita = async (cpf: string): Promise<CPFValidationResu
     return { valid: false, status: 'INVALIDO', message: 'CPF com formato inválido' };
   }
   
-  try {
-    const response = await fetch(`https://brasilapi.com.br/api/cpf/v1/${cleaned}`, {
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    if (!response.ok) {
-      return { valid: false, status: 'NAO_ENCONTRADO', message: 'CPF não encontrado na Receita Federal' };
-    }
-    
-    const data = await response.json();
-    return {
-      valid: data.situacao_cadastral === 'Regular',
-      status: data.situacao_cadastral,
-      message: data.situacao_cadastral === 'Regular' ? 'CPF válido e ativo' : `Situação: ${data.situacao_cadastral}`
-    };
-  } catch (error) {
-    console.error('Erro na validação do CPF:', error);
-    return { valid: true, status: 'VERIFICACAO_INDISPONIVEL', message: 'Validação indisponível - usando fallback local' };
-  }
+  // Removida consulta à BrasilAPI para evitar vazamento de PII (LGPD).
+  // Confia apenas na validação matemática.
+  return { valid: true, status: 'VALIDO_LOCAL', message: 'CPF com formato válido' };
 };
