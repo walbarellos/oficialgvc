@@ -68,19 +68,19 @@ Todas as correções de segurança das etapas anteriores foram verificadas e apl
 ## 🧪 Testes Recomendados (Manual)
 
 ### Autenticação
-- [ ] Tentativa de login com senha incorreta → Rate limit ativado
-- [ ] Sessão expirada → Redirecionamento automático para login
+- [x] Tentativa de login com senha incorreta → Rate limit ativado
+- [x] Sessão expirada → Redirecionamento automático para login
 
 ### IDOR
-- [ ] Usuário coordenador tenta acessar dados de outro espaço → Bloqueado
-- [ ] Usuário funcionário tenta editar usuários → Bloqueado
+- [x] Usuário coordenador tenta acessar dados de outro espaço → Bloqueado
+- [x] Usuário funcionário tenta editar usuários → Bloqueado
 
 ### Auditoria
-- [ ] Criação de usuário → Log registrado (com CPF mascarado)
-- [ ] Exclusão de visita → Log registrado
+- [x] Criação de usuário → Log registrado (com CPF mascarado)
+- [x] Exclusão de visita → Log registrado
 
 ### XSS
-- [ ] Tentativa de injeção em campos de texto → Rejeitado pelo banco
+- [x] Tentativa de injeção em campos de texto → Rejeitado pelo banco
 
 ---
 

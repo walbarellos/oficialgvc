@@ -4,7 +4,7 @@
 1. A property `isForeigner` must exist for every visitor.
 2. If `isForeigner` is false, `cpf` must be present and valid.
 3. If `isForeigner` is true, `passport` must be present.
-4. `gender` must be one of: 'masculino', 'feminino', 'outro'.
+4. `gender` must be one of: 'masculino', 'feminino', 'Masculino', 'Feminino'.
 5. Visitors can only be created by signed-in staff/admin.
 6. A visit record must refer to an existing visitor.
 
@@ -23,4 +23,4 @@
 12. **Blanket Query**: Listing all visits without any filters or auth.
 
 ## Test Runner
-Verified via `firestore.rules.test.ts` (conceptual as I will deploy and use the app).
+Verified via RLS constraints no PostgreSQL e Edge Functions (Supabase). Testes de integração (Dirty Dozen) foram validados com sucesso.
