@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 export interface Agendamento {
   id?: string;
   espaco_id: string;
+  protocolo?: string;
   solicitante_nome: string;
   solicitante_email: string;
   solicitante_telefone: string;

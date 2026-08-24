@@ -166,6 +166,7 @@ export default function AgendamentoPublico() {
   const [loadingSpaces, setLoadingSpaces] = useState(true);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [protocoloSalvo, setProtocoloSalvo] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [conflitos, setConflitos] = useState<any[]>([]);
   const [assinaturaInfo, setAssinaturaInfo] = useState<{
@@ -631,6 +632,7 @@ try {
       sessionStorage.removeItem('gvc_agendamento_draft');
       sessionStorage.removeItem('gvc_agendamento_step');
 
+      setProtocoloSalvo(data?.data?.protocolo || 'GVC-GERACAO-PENDENTE');
       setSuccess(true);
     } catch (e: any) {
       console.error('Erro completo:', e);
@@ -640,29 +642,9 @@ try {
     setLoading(false);
   };
 
-  const generateProtocolo = () => {
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    
-    let seq = sessionStorage.getItem('gvc_protocol_seq');
-    let nextSeq = 1;
-    if (seq) {
-      const [savedDate, savedSeq] = seq.split('-');
-      const today = `${year}${month}${day}`;
-      if (savedDate === today) {
-        nextSeq = parseInt(savedSeq) + 1;
-      }
-    }
-    const newSeq = String(nextSeq).padStart(2, '0');
-    sessionStorage.setItem('gvc_protocol_seq', `${year}${month}${day}-${newSeq}`);
-    
-    return `GEC-${year}${month}${day}-${newSeq}`;
-  };
 
   const handleExportPDF = () => {
-    const protocolo = generateProtocolo();
+    const protocolo = protocoloSalvo || 'GVC-PENDENTE';
     const printContent = `
       <html>
         <head>
@@ -769,7 +751,7 @@ try {
   };
 
   if (success) {
-    const protocolo = generateProtocolo();
+    const protocolo = protocoloSalvo || 'GVC-PENDENTE';
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-lg w-full text-center">
@@ -1591,7 +1573,7 @@ try {
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                       <p className="text-sm text-indigo-600 font-medium">Protocolo de Agendamento</p>
-                      <p className="text-2xl font-bold text-indigo-900">{generateProtocolo()}</p>
+                      <p className="text-2xl font-bold text-indigo-900">{protocoloSalvo || 'Aguardando envio...'}</p>
                       <p className="text-xs text-indigo-500 mt-1">
                         Gerado em: {new Date().toLocaleString('pt-BR')}
                       </p>

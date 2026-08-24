@@ -159,6 +159,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     necessita_equipamentos TEXT,
     observacoes TEXT,
     status TEXT DEFAULT 'pendente',
+    protocolo TEXT UNIQUE,
     termo_aceito BOOLEAN DEFAULT false,
     termo_aceito_em TIMESTAMP,
     responsabhilidade_evento BOOLEAN DEFAULT false,

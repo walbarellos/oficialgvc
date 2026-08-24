@@ -30,6 +30,9 @@ serve(async (req) => {
     
     // Gerar ID único e timestamp para assinatura digital
     const assinaturaId = crypto.randomUUID()
+    const anoAtual = new Date().getFullYear();
+    const hashUnico = crypto.randomUUID().split('-')[0].toUpperCase();
+    const protocoloGerado = `GVC-${anoAtual}-${hashUnico}`;
     const assinaturaData = new Date().toISOString()
 
     // Validar dados obrigatórios
@@ -67,6 +70,7 @@ serve(async (req) => {
         necessita_equipamentos: agendamento.necessita_equipamentos || null,
         observacoes: agendamento.observacoes || null,
         status: 'pendente',
+        protocolo: protocoloGerado,
         
         // Termos
         termo_aceito: agendamento.termo_aceito || false,
