@@ -87,7 +87,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             // Realtime space updates
-            spaceSubscription = supabase.channel('space-updates')
+            if (spaceSubscription) { supabase.removeChannel(spaceSubscription); }
+                  // Remove canais antigos para não duplicar inscrição
+      supabase.getChannels().forEach((channel) => {
+        if (channel.topic.startsWith('realtime:space-updates') || channel.topic.startsWith('realtime:user-updates')) {
+          supabase.removeChannel(channel);
+        }
+      });
+
+      spaceSubscription = supabase.channel('space-updates-' + Math.random())
               .on('postgres_changes', { event: '*', schema: 'public', table: 'espacos', filter: `id=eq.${formattedUser.espacoId}` }, payload => {
                 if (payload.new) {
                   setSpaceConfig(formatSpace(payload.new));
