@@ -73,26 +73,14 @@ export default function Settings() {
 
   const handleExportAll = async () => {
     try {
-      const tables = ['visits', 'lockers', 'visitors', 'configuracoes', 'usuarios', 'espacos'];
-      const allData: Record<string, any> = {
-        metadata: {
-          dataExportacao: new Date().toISOString(),
-          versaoSistema: "1.3.0",
-          totalRegistros: {}
-        }
-      };
 
-      for (const table of tables) {
-        const { data, error } = await supabase.from(table).select('*');
-        if (error) {
-          console.error(`Erro ao exportar ${table}:`, error);
-          continue;
-        }
-        allData[table] = data;
-        allData.metadata.totalRegistros[table] = data.length;
+      const { data, error } = await supabase.functions.invoke('export-backup');
+      if (error || !data) {
+        throw new Error(error?.message || 'Erro desconhecido');
       }
 
-      const jsonString = JSON.stringify(allData, null, 2);
+      const jsonString = JSON.stringify(data, null, 2);
+
       
       const blob = new Blob([jsonString], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

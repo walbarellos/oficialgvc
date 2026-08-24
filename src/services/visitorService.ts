@@ -27,9 +27,7 @@ export const visitorService = {
 
     async listAll() {
         const { data, error } = await supabase
-            .from('visitors')
-            .select('*')
-            .order('full_name', { ascending: true });
+            .from('visitors').select('*').order('full_name', { ascending: true }).limit(500);
         return { data: data as Visitor[], error };
     },
 

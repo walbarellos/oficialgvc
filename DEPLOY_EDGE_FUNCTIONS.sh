@@ -20,3 +20,5 @@ echo "Deploying public-submit-agendamento..."
 supabase functions deploy public-submit-agendamento --no-verify-jwt
 
 echo "Pronto! Certifique-se de configurar os secrets no Supabase (RESEND_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)!"
+echo "Deploying export-backup..."
+supabase functions deploy export-backup --no-verify-jwt

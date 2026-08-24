@@ -135,7 +135,7 @@ export default function Reports() {
   const fetchVisits = async () => {
     setLoading(true);
     try {
-      let q = supabase.from('visits').select('*')
+      let q = supabase.from('visits').select('*').limit(1000)
         .gte('checkin', new Date(startDate + 'T00:00:00').toISOString())
         .lte('checkin', new Date(endDate + 'T23:59:59').toISOString())
         .order('checkin', { ascending: false });

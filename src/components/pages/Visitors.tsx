@@ -43,7 +43,7 @@ export default function Visitors() {
   const fetchVisitors = useCallback(async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase.from('visitors').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('visitors').select('*').order('created_at', { ascending: false }).limit(200);
       
       if (error) {
         console.error('Erro ao buscar visitantes:', error);

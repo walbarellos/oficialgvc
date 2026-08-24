@@ -56,7 +56,8 @@ export const agendamentoService = {
     let query = supabase
       .from('agendamentos')
       .select('*, espacos(nome, municipio)')
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(200);
 
     if (filters?.espaco_id) {
       query = query.eq('espaco_id', filters.espaco_id);

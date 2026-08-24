@@ -17,7 +17,7 @@ const UsersTab: React.FC = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data } = await supabase.from('usuarios').select('*').order('nome');
+      const { data } = await supabase.from('usuarios').select('*').order('nome').limit(200);
       if (data) {
         setUsers(data.map(d => ({
           ...d,
