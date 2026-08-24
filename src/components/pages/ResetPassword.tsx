@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
-import Logo from '../ui/Logo';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -43,7 +42,12 @@ export default function ResetPassword() {
   return (
     <div className="min-h-screen bg-surface flex flex-col items-center justify-center p-4">
       <div className="mb-8">
-        <Logo />
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-secondary rounded-xl flex items-center justify-center">
+            <span className="text-white font-display font-bold text-2xl">F</span>
+          </div>
+          <h1 className="text-2xl font-display font-bold text-slate-800">GVC Cultural</h1>
+        </div>
       </div>
       
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden p-8">
