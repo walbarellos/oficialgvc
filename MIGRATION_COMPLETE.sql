@@ -416,15 +416,18 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION prevent_double_checkin()
 RETURNS TRIGGER AS $$
 BEGIN
-    IF NEW.espaco_id IS NOT NULL THEN
-        DELETE FROM visits
-        WHERE visitor_id = NEW.visitor_id
-            AND espaco_id = NEW.espaco_id
-            AND status = 'Ativo';
+    IF EXISTS (
+        SELECT 1 FROM visits 
+        WHERE visitor_id = NEW.visitor_id 
+        AND espaco_id = NEW.espaco_id
+        AND status = 'Ativo'
+        AND id != NEW.id
+    ) THEN
+        RAISE EXCEPTION 'Visitante já possui um check-in ativo neste espaço.';
     END IF;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
 
 -- Log de alterações de usuário
 CREATE OR REPLACE FUNCTION log_usuario_changes()
@@ -804,3 +807,18 @@ ALTER TABLE log_agendamentos ADD CONSTRAINT fk_log_agendamentos_usuario FOREIGN 
 -- agendamentos_rascunho
 ALTER TABLE agendamentos_rascunho DROP CONSTRAINT IF EXISTS fk_agendamentos_rascunho_espaco;
 ALTER TABLE agendamentos_rascunho ADD CONSTRAINT fk_agendamentos_rascunho_espaco FOREIGN KEY (espaco_id) REFERENCES espacos(id) ON DELETE SET NULL;
+CREATE OR REPLACE FUNCTION prevent_double_checkin()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM visits 
+        WHERE visitor_id = NEW.visitor_id 
+        AND espaco_id = NEW.espaco_id
+        AND status = 'Ativo'
+        AND id != NEW.id
+    ) THEN
+        RAISE EXCEPTION 'Visitante já possui um check-in ativo neste espaço.';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
