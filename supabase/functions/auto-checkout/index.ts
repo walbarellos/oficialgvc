@@ -7,9 +7,6 @@ import {
 
 serve(async (req) => {
   try {
-    if (req.method === "OPTIONS") {
-      return new Response("ok", { headers: corsHeaders });
-    }
 
     // Job de sistema: NÃO aceitar JWT de usuário comum — exige segredo de cron
     requireCronSecret(req);
@@ -30,13 +27,13 @@ serve(async (req) => {
       console.error("Fetch error:", fetchError);
       return new Response(JSON.stringify({ error: fetchError.message }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
     if (!exceededVisits || exceededVisits.length === 0) {
       return new Response(JSON.stringify({ message: "Nenhuma visita excedida", processed: 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
@@ -56,7 +53,7 @@ serve(async (req) => {
       console.error("Update error:", updateError);
       return new Response(JSON.stringify({ error: updateError.message }), {
         status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" },
       });
     }
 
@@ -65,7 +62,7 @@ serve(async (req) => {
       processed: visitIds.length,
       message: `${visitIds.length} visitas encerradas`
     }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
     });
 
   } catch (error) {
@@ -73,7 +70,7 @@ serve(async (req) => {
     console.error("Function error:", error);
     return new Response(JSON.stringify({ error: String(error) }), {
       status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
     });
   }
 });
