@@ -14,6 +14,7 @@ interface UserModalProps {
 
 export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProps) {
   const { userData: currentAdmin } = useAuth();
+  const [errorMsg, setErrorMsg] = useState('');
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
@@ -87,15 +88,15 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.nome.trim()) return alert('Nome é obrigatório');
-    if (!validateEmail(formData.email)) return alert('Email inválido');
+    if (!formData.nome.trim()) return setErrorMsg('Nome é obrigatório');
+    if (!validateEmail(formData.email)) return setErrorMsg('Email inválido');
     
     if (changePassword) {
-      if (formData.senha.length < 8) return alert('A senha deve ter no mínimo 8 caracteres');
-      if (!/[A-Z]/.test(formData.senha)) return alert('A senha deve conter pelo menos 1 letra maiúscula');
-      if (!/[0-9]/.test(formData.senha)) return alert('A senha deve conter pelo menos 1 número');
-      if (!/[@#$%^&+=!.?_]/.test(formData.senha)) return alert('A senha deve conter pelo menos 1 caractere especial (@, #, $, etc.)');
-      if (formData.senha !== formData.confirmSenha) return alert('As senhas não conferem');
+      if (formData.senha.length < 8) return setErrorMsg('A senha deve ter no mínimo 8 caracteres');
+      if (!/[A-Z]/.test(formData.senha)) return setErrorMsg('A senha deve conter pelo menos 1 letra maiúscula');
+      if (!/[0-9]/.test(formData.senha)) return setErrorMsg('A senha deve conter pelo menos 1 número');
+      if (!/[@#$%^&+=!.?_]/.test(formData.senha)) return setErrorMsg('A senha deve conter pelo menos 1 caractere especial (@, #, $, etc.)');
+      if (formData.senha !== formData.confirmSenha) return setErrorMsg('As senhas não conferem');
     }
 
     setLoading(true);
@@ -103,7 +104,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
       if (!userToEdit || userToEdit.email !== formData.email) {
         const { data: existing } = await supabase.from('usuarios').select('id').eq('email', formData.email);
         if (existing && existing.length > 0) {
-          alert("Este email já está sendo utilizado por outro usuário no banco de dados.");
+          setErrorMsg("Este email já está sendo utilizado por outro usuário no banco de dados.");
           setLoading(false);
           return;
         }
@@ -123,7 +124,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
         
         if (updateError) {
           console.error('Update error:', updateError);
-          alert('Erro ao atualizar: ' + updateError.message);
+          setErrorMsg('Erro ao atualizar: ' + updateError.message);
           setLoading(false);
           return;
         }
@@ -137,7 +138,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
               body: { targetUserId: userToEdit.id, password: formData.senha }
             });
             if (fnError) {
-              alert('Erro ao alterar senha: ' + fnError.message);
+              setErrorMsg('Erro ao alterar senha: ' + fnError.message);
               setLoading(false);
               return;
             }
@@ -156,21 +157,21 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
         });
 
         if (fnError || responseData?.error) {
-          alert('Erro ao criar usuário: ' + (fnError?.message || responseData?.error));
+          setErrorMsg('Erro ao criar usuário: ' + (fnError?.message || responseData?.error));
           throw new Error(fnError?.message || responseData?.error);
         }
 
         const newUid = responseData?.data?.id || responseData?.user?.id;
         if (newUid) {
           await auditService.log({ acao: "criou_usuario", detalhes: `Criou usuário ${formData.nome} (${formData.perfil}) de forma segura`, entidadeId: newUid, userProfile: currentAdmin });
-          alert('Usuário criado com sucesso com privilégios adequados!');
+          setErrorMsg('Usuário criado com sucesso com privilégios adequados!');
         }
       }
       
       onClose();
     } catch (error: any) {
       console.error(error);
-      alert('Erro ao salvar usuário: ' + (error.message || 'Erro desconhecido'));
+      setErrorMsg('Erro ao salvar usuário: ' + (error.message || 'Erro desconhecido'));
     } finally {
       setLoading(false);
     }

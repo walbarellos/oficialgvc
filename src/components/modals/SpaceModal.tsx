@@ -72,6 +72,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
   });
 
   useEffect(() => {
+    setErrorMsg('');
     if (spaceToEdit) {
       setFormData({
         nome: spaceToEdit.nome || '',
@@ -148,11 +149,13 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.nome || !formData.email || !formData.endereco || !formData.municipio) {
-      return alert('Preencha todos os campos obrigatórios (*)');
+      setErrorMsg('Preencha todos os campos obrigatórios (*)');
+      return;
     }
 
     if (formData.perfilArmarios && (formData.totalArmarios < 5 || formData.totalArmarios > 50)) {
-      return alert('O total de armários deve ser entre 5 e 50.');
+      setErrorMsg('O total de armários deve ser entre 5 e 50.');
+      return;
     }
 
     setLoading(true);
@@ -192,7 +195,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
         const { error: updateError } = await supabase.from('espacos').update(dataToSave).eq('id', spaceToEdit.id);
         if (updateError) {
           console.error('Erro ao atualizar:', updateError);
-          alert('Erro ao salvar: ' + updateError.message);
+          setErrorMsg('Erro ao salvar: ' + updateError.message);
           setLoading(false);
           return;
         }
@@ -207,7 +210,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
       onClose();
     } catch (error) {
       console.error(error);
-      alert('Erro ao salvar espaço.');
+      setErrorMsg('Erro ao salvar espaço.');
     } finally {
       setLoading(false);
     }

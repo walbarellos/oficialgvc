@@ -98,7 +98,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
         const { data: existingVisitors } = await visitorService.findByDocument(cleanCPF, false);
         if (existingVisitors) {
           if (!(visitorToEdit && existingVisitors.id === visitorToEdit.id)) {
-            alert(`CPF já cadastrado para: ${existingVisitors.full_name}`);
+            setErrorMsg(`CPF já cadastrado para: ${existingVisitors.full_name}`);
             setLoading(false);
             return;
           }
