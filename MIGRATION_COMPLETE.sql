@@ -118,6 +118,7 @@ CREATE TABLE IF NOT EXISTS lockers (
 CREATE TABLE IF NOT EXISTS auditoria (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     usuario TEXT NOT NULL,
+    usuario_id UUID,
     perfil TEXT DEFAULT 'desconhecido',
     acao TEXT NOT NULL,
     detalhes TEXT,
@@ -676,3 +677,9 @@ ALTER TABLE email_queue ENABLE ROW LEVEL SECURITY;
 
 -- Impedir acesso direto ao cliente (apenas service_role pode operar na fila)
 -- Nenhuma política pública ou autenticada de SELECT/INSERT é criada
+ALTER TABLE auditoria ADD COLUMN IF NOT EXISTS usuario_id UUID;
+DROP TRIGGER IF EXISTS trigger_log_usuario_changes ON usuarios;
+CREATE TRIGGER trigger_log_usuario_changes
+AFTER INSERT OR UPDATE OR DELETE ON usuarios
+FOR EACH ROW
+EXECUTE FUNCTION log_usuario_changes();
