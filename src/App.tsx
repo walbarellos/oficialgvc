@@ -21,6 +21,7 @@ const Reports = lazy(() => import('./components/pages/Reports'));
 const SettingsPage = lazy(() => import('./components/pages/Settings'));
 const Login = lazy(() => import('./components/pages/Login'));
 const LoginPublico = lazy(() => import('./components/pages/LoginPublico'));
+const ResetPassword = lazy(() => import('./components/pages/ResetPassword'));
 const CadastroPublico = lazy(() => import('./components/pages/CadastroPublico'));
 const TermoCompromisso = lazy(() => import('./components/pages/TermoCompromisso'));
 
@@ -97,6 +98,7 @@ export default function App() {
             <Routes>
             <Route path="/gerenciamento" element={<Login />} />
             <Route path="/login" element={<Navigate to="/gerenciamento" replace />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/agendamento" element={<LoginPublico />} />
             <Route path="/login-publico" element={<Navigate to="/agendamento" replace />} />
             <Route path="/agendamento/cadastro" element={<CadastroPublico />} />

@@ -21,6 +21,24 @@ export default function LoginPublico() {
   const [showPassword, setShowPassword] = useState(false);
 
 
+  const handleResetPassword = async () => {
+    if (!email) {
+      setError('Por favor, preencha o email para recuperar a senha');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      setError('Erro ao enviar email de recuperação: ' + error.message);
+    } else {
+      setError('Instruções de recuperação enviadas para seu email!');
+    }
+    setLoading(false);
+  };
+
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -298,6 +316,13 @@ export default function LoginPublico() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5" htmlFor="password">
                   Senha
                 </label>
+                <button
+                  type="button"
+                  onClick={handleResetPassword}
+                  className="text-xs text-secondary hover:text-secondary/80 font-medium absolute right-0 top-0"
+                >
+                  Esqueceu?
+                </button>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg className="w-4 h-4 text-slate-400 group-focus-within:text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
