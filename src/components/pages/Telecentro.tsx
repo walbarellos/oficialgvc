@@ -159,7 +159,7 @@ export default function Telecentro() {
         .from('visits')
         .select('id, local')
         .eq('visitor_id', visitante.id)
-        .in('status', ['Ativo', 'active'])
+        .eq('status', 'Ativo')
         .eq('espaco_id', targetEspacoId)
         .limit(1);
       

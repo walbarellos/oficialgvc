@@ -18,7 +18,7 @@ import Footer from '../layout/PageFooter';
 interface Locker {
   id: string;
   number: number;
-  status: 'available' | 'occupied' | 'maintenance';
+  status: 'Livre' | 'Ocupado' | 'Manutenção';
   visitorId?: string;
   visitorName?: string;
   updatedAt?: any;
@@ -73,7 +73,7 @@ export default function Lockers() {
             : { 
                 id: `temp-${i}`, 
                 number: i, 
-                status: 'available' 
+                status: 'Livre' 
               }
         );
       }
@@ -130,7 +130,7 @@ export default function Lockers() {
   }, [debouncedSearchTerm]);
 
   const handleLockerClick = (locker: Locker) => {
-    if (locker.status === 'occupied') return;
+    if (locker.status === 'Ocupado') return;
     
     setSelectedLocker(locker);
     setIsSearchOpen(true);
@@ -149,7 +149,7 @@ export default function Lockers() {
         .from('visits')
         .select('id, local')
         .eq('visitor_id', visitor.id)
-        .in('status', ['Ativo', 'active'])
+        .eq('status', 'Ativo')
         .eq('espaco_id', targetEspacoId)
         .limit(1);
       
@@ -165,7 +165,7 @@ export default function Lockers() {
       if (targetEspacoId) {
         const { data: existing } = await supabase.from('lockers').select('number')
           .eq('espaco_id', targetEspacoId)
-          .in('status', ['occupied', 'Ocupado'])
+          .eq('status', 'Ocupado')
           .eq('visitor_id', visitor.id);
         
         if (existing && existing.length > 0) {
@@ -180,7 +180,7 @@ export default function Lockers() {
 
       await supabase.from('lockers').insert({
         number: selectedLocker.number,
-        status: 'occupied',
+        status: 'Ocupado',
         visitor_id: visitor.id,
         visitor_name: visitor.fullName,
         espaco_id: targetEspacoId
@@ -212,9 +212,9 @@ export default function Lockers() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
-      case 'occupied': return 'bg-amber-50 text-amber-600 border-amber-100';
-      case 'maintenance': return 'bg-red-50 text-red-600 border-red-100';
+      case 'Livre': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'Ocupado': return 'bg-amber-50 text-amber-600 border-amber-100';
+      case 'Manutenção': return 'bg-red-50 text-red-600 border-red-100';
       default: return 'bg-gray-50 text-gray-400 border-gray-100';
     }
   };
@@ -281,7 +281,7 @@ export default function Lockers() {
               whileHover={{ y: -4 }}
               onClick={() => handleLockerClick(locker)}
               className={`relative overflow-hidden cursor-pointer group bg-white p-6 rounded-2xl border-2 transition-all ${
-                locker.status === 'occupied' 
+                locker.status === 'Ocupado' 
                   ? 'border-amber-200 shadow-amber-900/5 shadow-lg' 
                   : 'border-gray-100 hover:border-emerald-200 hover:shadow-emerald-900/5 hover:shadow-lg'
               }`}
@@ -290,7 +290,7 @@ export default function Lockers() {
                 <span className="text-[40px] font-display font-black text-gray-400 group-hover:text-primary transition-colors leading-none">
                   {locker.number.toString().padStart(2, '0')}
                 </span>
-                {locker.status === 'occupied' ? (
+                {locker.status === 'Ocupado' ? (
                   <div className="p-2 bg-amber-100 rounded-lg text-amber-600 shadow-inner">
                     <Lock size={20} />
                   </div>
@@ -304,12 +304,12 @@ export default function Lockers() {
               <div className="space-y-2">
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(locker.status)}`}>
                   <div className={`w-1.5 h-1.5 rounded-full ${
-                    locker.status === 'available' ? 'bg-emerald-500' : 'bg-amber-500'
+                    locker.status === 'Livre' ? 'bg-emerald-500' : 'bg-amber-500'
                   }`} />
-                  {locker.status === 'available' ? 'Livre' : 'Ocupado'}
+                  {locker.status === 'Livre' ? 'Livre' : 'Ocupado'}
                 </div>
 
-                {locker.status === 'occupied' && (
+                {locker.status === 'Ocupado' && (
                   <div className="mt-2">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Ocupado por:</p>
                     <p className="text-xs font-bold text-gray-900 truncate">{locker.visitorName}</p>
@@ -317,7 +317,7 @@ export default function Lockers() {
                 )}
               </div>
 
-              {locker.status === 'occupied' && (
+              {locker.status === 'Ocupado' && (
                 <div className="mt-4 pt-4 border-t border-amber-50">
                    <button 
                     type="button"

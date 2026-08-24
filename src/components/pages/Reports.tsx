@@ -361,7 +361,7 @@ export default function Reports() {
         'Local de Acesso': v.local,
         'Horário Entrada': v.checkin ? format(new Date(v.checkin), 'dd/MM/yyyy HH:mm') : 'N/A',
         'Horário Saída': v.checkout ? format(new Date(v.checkout), 'dd/MM/yyyy HH:mm') : 'Pendente',
-        'Situação': status === 'Ativo' || status === 'active' ? 'ENTRADA' : (status === 'Concluído' || status === 'completed' || status === 'Excedido' ? 'SAÍDA' : status)
+        'Situação': status === 'Ativo' ? 'ENTRADA' : (status === 'Concluído' || status === 'Excedido' ? 'SAÍDA' : status)
       };
     });
 
@@ -491,10 +491,8 @@ export default function Reports() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Ativo':
-      case 'active':
         return 'bg-emerald-100 text-emerald-800';
       case 'Concluído':
-      case 'completed':
         return 'bg-blue-100 text-blue-800';
       case 'Excedido':
         return 'bg-red-100 text-red-800';
@@ -729,9 +727,9 @@ export default function Reports() {
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusBadge(visit.status)}`}>
                           <div className={`w-1.5 h-1.5 rounded-full ${
-                             (visit.status as string) === 'Ativo' || (visit.status as string) === 'active' ? 'bg-emerald-500' : ((visit.status as string) === 'Concluído' || (visit.status as string) === 'completed' ? 'bg-blue-500' : 'bg-red-500')
+                             (visit.status as string) === 'Ativo' ? 'bg-emerald-500' : ((visit.status as string) === 'Concluído' ? 'bg-blue-500' : 'bg-red-500')
                           }`} />
-                          {(visit.status as string) === 'Ativo' || (visit.status as string) === 'active' ? 'ENTRADA' : ((visit.status as string) === 'Concluído' || (visit.status as string) === 'completed' ? 'SAÍDA' : visit.status)}
+                          {(visit.status as string) === 'Ativo' ? 'ENTRADA' : ((visit.status as string) === 'Concluído' ? 'SAÍDA' : visit.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right no-print">

@@ -40,9 +40,9 @@ export interface Locker {
 }
 
 export enum VisitStatus {
-  ACTIVE = 'active',
-  COMPLETED = 'completed',
-  OVERSTAYED = 'overstayed'
+  ACTIVE = 'Ativo',
+  COMPLETED = 'Concluído',
+  OVERSTAYED = 'Excedido'
 }
 
 export interface Visit {

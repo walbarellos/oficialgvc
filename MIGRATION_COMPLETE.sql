@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS visits (
     espaco_id UUID,
     checkin TIMESTAMPTZ DEFAULT now(),
     checkout TIMESTAMPTZ,
-    status TEXT DEFAULT 'Ativo',
+    status TEXT DEFAULT 'Ativo' CHECK (status IN ('Ativo', 'Concluído', 'Cancelado')),
     armario TEXT,
     created_at TIMESTAMPTZ DEFAULT now()
 );
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS visits (
 CREATE TABLE IF NOT EXISTS computadores (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     numero INTEGER NOT NULL,
-    status TEXT DEFAULT 'Livre',
+    status TEXT DEFAULT 'Livre' CHECK (status IN ('Livre', 'Em Uso', 'Excedido', 'Manutenção')),
     usuario_id UUID,
     usuario_nome TEXT,
     horario_inicio TIMESTAMPTZ,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS computadores (
 CREATE TABLE IF NOT EXISTS lockers (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     number INTEGER NOT NULL,
-    status TEXT DEFAULT 'available',
+    status TEXT DEFAULT 'Livre' CHECK (status IN ('Livre', 'Ocupado', 'Manutenção')),
     visitor_id UUID,
     visitor_name TEXT,
     espaco_id UUID,

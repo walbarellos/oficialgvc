@@ -241,10 +241,10 @@ export default function Dashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-black text-slate-900">{formatTime(visit.checkin)}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-sm inline-block mt-1 ${visit.status === 'Ativo' || visit.status === 'active' ? 'bg-emerald-100 text-emerald-700' :
-                        (visit.status === 'Concluído' || visit.status === 'completed' ? 'bg-slate-100 text-slate-500' : 'bg-red-100 text-red-700')
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter shadow-sm inline-block mt-1 ${visit.status === 'Ativo' ? 'bg-emerald-100 text-emerald-700' :
+                        (visit.status === 'Concluído' ? 'bg-slate-100 text-slate-500' : 'bg-red-100 text-red-700')
                       }`}>
-                      {visit.status === 'Ativo' || visit.status === 'active' ? 'Em curso' : (visit.status === 'Concluído' || visit.status === 'completed' ? 'Encerrado' : visit.status)}
+                      {visit.status === 'Ativo' ? 'Em curso' : (visit.status === 'Concluído' ? 'Encerrado' : visit.status)}
                     </span>
                   </div>
                 </div>

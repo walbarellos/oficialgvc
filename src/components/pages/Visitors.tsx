@@ -253,7 +253,7 @@ const mapped = data.map(d => ({
       const { data } = await supabase
         .from('visits')
         .select('*')
-        .in('status', ['Ativo', 'active'])
+        .eq('status', 'Ativo')
         .order('checkin', { ascending: false });
       setActiveVisits(data || []);
     } catch (err) {
