@@ -24,7 +24,7 @@ service cloud.firestore {
     }
 
     function isEmailVerified() {
-      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.email == 'yuribarbosa18@gmail.com');
+      return isSignedIn() && (request.auth.token.email_verified == true || request.auth.token.email == 'admin@exemplo.com');
     }
 
     // Role checks - direct UID lookup since Firestore doc ID == Auth UID
@@ -34,7 +34,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isSignedIn() && (
-        request.auth.token.email == 'yuribarbosa18@gmail.com' || 
+        request.auth.token.email == 'admin@exemplo.com' || 
         (exists(/databases/$(database)/documents/usuarios/$(request.auth.uid)) && 
          getUserData(request.auth.uid).perfil == 'administrador')
       );
