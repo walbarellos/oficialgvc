@@ -129,10 +129,19 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
         }
         
         // Se a senha foi alterada e for o próprio usuário, atualizamos com updateUser
-        if (changePassword && currentAdmin && currentAdmin.id === userToEdit.id) {
-          await supabase.auth.updateUser({ password: formData.senha });
-        } else if (changePassword) {
-          alert("Atenção: A atualização de senha para outros usuários via painel pode exigir a Supabase Admin API.");
+        if (changePassword) {
+          if (currentAdmin && currentAdmin.id === userToEdit.id) {
+            await supabase.auth.updateUser({ password: formData.senha });
+          } else {
+            const { error: fnError } = await supabase.functions.invoke('update-user-password', {
+              body: { targetUserId: userToEdit.id, password: formData.senha }
+            });
+            if (fnError) {
+              alert('Erro ao alterar senha: ' + fnError.message);
+              setLoading(false);
+              return;
+            }
+          }
         }
       } else {
         const { data: responseData, error: fnError } = await supabase.functions.invoke('create-user', {
@@ -151,7 +160,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
           throw new Error(fnError?.message || responseData?.error);
         }
 
-        const newUid = responseData?.user?.id;
+        const newUid = responseData?.data?.id || responseData?.user?.id;
         if (newUid) {
           await auditService.log({ acao: "criou_usuario", detalhes: `Criou usuário ${formData.nome} (${formData.perfil}) de forma segura`, entidadeId: newUid, userProfile: currentAdmin });
           alert('Usuário criado com sucesso com privilégios adequados!');
