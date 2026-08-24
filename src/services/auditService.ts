@@ -49,10 +49,7 @@ export const auditService = {
       const payload = {
         acao: params.acao,
         detalhes: maskedDetalhes,
-        entidade_id: params.entidadeId || null,
-        usuario: user?.email || "sistema",
-        perfil: params.userProfile?.perfil || "desconhecido",
-        usuario_id: user?.id || null
+        entidade_id: params.entidadeId || null
       };
 
       const { data, error } = await supabase.functions.invoke('register-audit', {
