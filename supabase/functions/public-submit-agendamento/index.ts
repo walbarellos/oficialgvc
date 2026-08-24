@@ -45,6 +45,54 @@ serve(async (req) => {
     };
 
 
+    if (agendamento.termo_aceito !== true) {
+      return new Response(
+        JSON.stringify({ error: 'Você deve aceitar o Termo de Compromisso' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+
+    // Rate limit simples por IP: max 3 solicitações por hora
+    const umaHoraAtras = new Date(Date.now() - 3600000).toISOString();
+    const { count, error: rlError } = await supabaseAdmin
+      .from('agendamentos')
+      .select('id', { count: 'exact', head: true })
+      .eq('ip_confirmacao', clientIP)
+      .gte('created_at', umaHoraAtras);
+
+    if (rlError) {
+      console.error('Erro de rate limit:', rlError);
+    } else if (count && count >= 3) {
+      return new Response(
+        JSON.stringify({ error: 'Muitas solicitações deste endereço de rede. Tente novamente mais tarde.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Validar conflito de horário no servidor
+    const { data: hasConflict, error: conflictError } = await supabaseAdmin.rpc('verificar_conflito_agendamento', {
+      p_espaco_id: agendamento.espaco_id,
+      p_data: agendamento.data_pretendida,
+      p_inicio: agendamento.horario_inicio,
+      p_fim: agendamento.horario_fim
+    });
+
+    if (conflictError) {
+      console.error('Erro ao verificar conflitos:', conflictError);
+      return new Response(
+        JSON.stringify({ error: 'Erro interno ao validar disponibilidade' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (hasConflict) {
+      return new Response(
+        JSON.stringify({ error: 'Já existe um agendamento aprovado para este horário e espaço.' }),
+        { status: 409, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Validar dados obrigatórios
     if (!agendamento.solicitante_nome || !agendamento.solicitante_email || !agendamento.espaco_id) {
       return new Response(
@@ -83,7 +131,7 @@ serve(async (req) => {
         protocolo: protocoloGerado,
         
         // Termos
-        termo_aceito: agendamento.termo_aceito || false,
+        termo_aceito: true,
         termo_aceito_em: agendamento.termo_aceito ? new Date().toISOString() : null,
         responsabhilidade_evento: agendamento.responsabhilidade_evento || false,
         danos_patrimonio: agendamento.danos_patrimonio || false,
@@ -153,11 +201,20 @@ serve(async (req) => {
       // Não falhar o agendamento por causa da assinatura, mas registrar
     }
 
-    // Limpar rascunho após sucesso
+    // Limpar rascunho apenas se o IP corresponder ao rascunho para provar posse
     if (agendamento.session_id) {
-      await supabaseAdmin.rpc('limpar_rascunho_agendamento', {
-        p_session_id: agendamento.session_id
-      }).catch(() => {})
+      const { data: draft } = await supabaseAdmin
+        .from('agendamentos_rascunho')
+        .select('session_id')
+        .eq('session_id', agendamento.session_id)
+        .eq('ip_publico', clientIP)
+        .single();
+        
+      if (draft) {
+        await supabaseAdmin.rpc('limpar_rascunho_agendamento', {
+          p_session_id: agendamento.session_id
+        }).catch(() => {})
+      }
     }
 
     return new Response(
