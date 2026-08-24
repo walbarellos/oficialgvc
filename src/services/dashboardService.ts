@@ -36,7 +36,7 @@ export const dashboardService = {
             // Buscar configuração de armários do espaço
             const { data: espaco, error: err3 } = await supabase
                 .from('espacos')
-                .select('perfil_armarios_quantidade')
+                .select('total_armarios')
                 .eq('id', espacoId)
                 .single();
 
@@ -69,7 +69,7 @@ export const dashboardService = {
                     visitasAtivas: ativas || 0,
                     visitasHoje: hoje || 0,
                     ocupacaoArmarios: ocupados || 0,
-                    totalArmarios: espaco?.perfil_armarios_quantidade || 0,
+                    totalArmarios: espaco?.total_armarios || 0,
                     mediaDiaria: Math.round((totalSemana || 0) / 7)
                 },
                 error: null

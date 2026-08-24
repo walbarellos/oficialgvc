@@ -8,7 +8,7 @@ export interface Space {
   municipio?: string;
   horario_funcionamento?: string;
   perfil_armarios?: boolean;
-  perfil_armarios_quantidade?: number;
+  total_armarios?: number;
   perfil_telecentro?: boolean;
   perfil_agendamento?: boolean;
   mensagem_boas_vindas?: string;

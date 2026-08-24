@@ -80,8 +80,8 @@ export default function Dashboard() {
       // Total de armários - se admin global, soma de todos os espaços
       let totalArmarios = spaceConfig?.totalArmarios || 20;
       if (isGlobalAdmin) {
-        const { data: spaces } = await supabase.from('espacos').select('perfil_armarios_quantidade').eq('ativo', true);
-        totalArmarios = spaces?.reduce((sum, s) => sum + (s.perfil_armarios_quantidade || 0), 0) || 20;
+        const { data: spaces } = await supabase.from('espacos').select('total_armarios').eq('ativo', true);
+        totalArmarios = spaces?.reduce((sum, s) => sum + (s.total_armarios || 0), 0) || 20;
       }
 
       setStats({

@@ -213,15 +213,15 @@ export default function Reports() {
 
       // Processar dados de gênero
       const genderCounts = {
-        'Masculino': 0,
-        'Feminino': 0
+        'masculino': 0,
+        'feminino': 0
       };
 
       visitorsData.forEach(v => {
-        if (v.gender === 'Masculino' || v.gender === 'masculino') {
-          genderCounts['Masculino']++;
-        } else if (v.gender === 'Feminino' || v.gender === 'feminino') {
-          genderCounts['Feminino']++;
+        if (v.gender === 'masculino') {
+          genderCounts['masculino']++;
+        } else if (v.gender === 'feminino') {
+          genderCounts['feminino']++;
         }
         // Ignora valores nulos ou outros
       });
@@ -230,9 +230,9 @@ export default function Reports() {
         Object.entries(genderCounts)
           .filter(([_, value]) => value > 0)
           .map(([name, value]) => ({
-            name,
+            name: name.charAt(0).toUpperCase() + name.slice(1),
             value,
-            color: name === 'Masculino' ? '#3B82F6' : '#EC4899'
+            color: name === 'masculino' ? '#3B82F6' : '#EC4899'
           }))
       );
 
