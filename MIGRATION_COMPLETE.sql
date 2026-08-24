@@ -193,6 +193,7 @@ CREATE TABLE IF NOT EXISTS agendamentos (
 -- AGENDAMENTOS_RASCUNHO (rascunho temporário)
 CREATE TABLE IF NOT EXISTS agendamentos_rascunho (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    CONSTRAINT agendamentos_rascunho_session_id_key UNIQUE (session_id),
     session_id TEXT NOT NULL,
     solicitante_nome TEXT,
     solicitante_email TEXT,
@@ -453,66 +454,141 @@ $$ LANGUAGE plpgsql;
 
 -- Rascunho de agendamento
 DROP FUNCTION IF EXISTS salvar_rascunho_agendamento(TEXT, JSONB);
-CREATE OR REPLACE FUNCTION salvar_rascunho_agendamento(p_session_id TEXT, p_data JSONB)
-RETURNS VOID AS $$
+CREATE OR REPLACE FUNCTION salvar_rascunho_agendamento(
+  p_session_id TEXT,
+  p_dados JSONB
+)
+RETURNS UUID AS $
+DECLARE
+  v_id UUID;
+  v_existing UUID;
 BEGIN
-    INSERT INTO agendamentos_rascunho (session_id, solicitante_nome, solicitante_email, solicitante_telefone,
-        solicitante_documento, tipo_solicitante, espaco_id, espaco_solicitado, data_pretendida,
-        horario_inicio, horario_fim, numero_participantes, descricao_evento, natureza_evento,
-        gratuito, termo_aceito, current_step)
-    VALUES (p_session_id,
-        p_data->>'solicitante_nome',
-        p_data->>'solicitante_email',
-        p_data->>'solicitante_telefone',
-        p_data->>'solicitante_documento',
-        p_data->>'tipo_solicitante',
-        (p_data->>'espaco_id')::uuid,
-        p_data->>'espaco_solicitado',
-        p_data->>'data_pretendida',
-        p_data->>'horario_inicio',
-        p_data->>'horario_fim',
-        (p_data->>'numero_participantes')::integer,
-        p_data->>'descricao_evento',
-        p_data->>'natureza_evento',
-        (p_data->>'gratuito')::boolean,
-        (p_data->>'termo_aceito')::boolean,
-        (p_data->>'current_step')::integer
+  -- Verificar se já existe rascunho para esta session
+  SELECT id INTO v_existing
+  FROM agendamentos_rascunho
+  WHERE session_id = p_session_id
+  ORDER BY updated_at DESC
+  LIMIT 1;
+
+  IF v_existing IS NOT NULL THEN
+    -- Atualizar
+    UPDATE agendamentos_rascunho
+    SET 
+      solicitante_nome = p_dados->>'solicitante_nome',
+      solicitante_email = p_dados->>'solicitante_email',
+      solicitante_telefone = p_dados->>'solicitante_telefone',
+      solicitante_documento = p_dados->>'solicitante_documento',
+      tipo_solicitante = p_dados->>'tipo_solicitante',
+      razao_social = p_dados->>'razao_social',
+      nome_instituicao = p_dados->>'nome_instituicao',
+      espaco_id = NULLIF(p_dados->>'espaco_id', '')::UUID,
+      tipo_espaco = p_dados->>'tipo_espaco',
+      espaco_solicitado = p_dados->>'espaco_solicitado',
+      data_pretendida = p_dados->>'data_pretendida',
+      horario_inicio = p_dados->>'horario_inicio',
+      horario_fim = p_dados->>'horario_fim',
+      numero_participantes = (p_dados->>'numero_participantes')::INTEGER,
+      descricao_evento = p_dados->>'descricao_evento',
+      natureza_evento = p_dados->>'natureza_evento',
+      gratuito = (p_dados->>'gratuito')::BOOLEAN,
+      valor_ingresso = p_dados->>'valor_ingresso',
+      necessita_equipamentos = p_dados->>'necessita_equipamentos',
+      observacoes = p_dados->>'observacoes',
+      termo_aceito = (p_dados->>'termo_aceito')::BOOLEAN,
+      responsabhilidade_evento = (p_dados->>'responsabhilidade_evento')::BOOLEAN,
+      danos_patrimonio = (p_dados->>'danos_patrimonio')::BOOLEAN,
+      respeito_lotacao = (p_dados->>'respeito_lotacao')::BOOLEAN,
+      autorizo_divulgacao = (p_dados->>'autorizo_divulgacao')::BOOLEAN,
+      termo_compromisso_assinado = (p_dados->>'termo_compromisso_assinado')::BOOLEAN,
+      termo_compromisso_data = NULLIF(p_dados->>'termo_compromisso_data', '')::TIMESTAMP,
+      termo_compromisso_ip = p_dados->>'termo_compromisso_ip',
+      current_step = (p_dados->>'current_step')::INTEGER,
+      updated_at = NOW()
+    WHERE id = v_existing
+    RETURNING id INTO v_id;
+  ELSE
+    -- Criar novo
+    INSERT INTO agendamentos_rascunho (
+      session_id,
+      solicitante_nome,
+      solicitante_email,
+      solicitante_telefone,
+      solicitante_documento,
+      tipo_solicitante,
+      razao_social,
+      nome_instituicao,
+      espaco_id,
+      tipo_espaco,
+      espaco_solicitado,
+      data_pretendida,
+      horario_inicio,
+      horario_fim,
+      numero_participantes,
+      descricao_evento,
+      natureza_evento,
+      gratuito,
+      valor_ingresso,
+      necessita_equipamentos,
+      observacoes,
+      termo_aceito,
+      responsabhilidade_evento,
+      danos_patrimonio,
+      respeito_lotacao,
+      autorizo_divulgacao,
+      termo_compromisso_assinado,
+      termo_compromisso_data,
+      termo_compromisso_ip,
+      current_step
+    ) VALUES (
+      p_session_id,
+      p_dados->>'solicitante_nome',
+      p_dados->>'solicitante_email',
+      p_dados->>'solicitante_telefone',
+      p_dados->>'solicitante_documento',
+      p_dados->>'tipo_solicitante',
+      p_dados->>'razao_social',
+      p_dados->>'nome_instituicao',
+      NULLIF(p_dados->>'espaco_id', '')::UUID,
+      p_dados->>'tipo_espaco',
+      p_dados->>'espaco_solicitado',
+      p_dados->>'data_pretendida',
+      p_dados->>'horario_inicio',
+      p_dados->>'horario_fim',
+      (p_dados->>'numero_participantes')::INTEGER,
+      p_dados->>'descricao_evento',
+      p_dados->>'natureza_evento',
+      (p_dados->>'gratuito')::BOOLEAN,
+      p_dados->>'valor_ingresso',
+      p_dados->>'necessita_equipamentos',
+      p_dados->>'observacoes',
+      (p_dados->>'termo_aceito')::BOOLEAN,
+      (p_dados->>'responsabhilidade_evento')::BOOLEAN,
+      (p_dados->>'danos_patrimonio')::BOOLEAN,
+      (p_dados->>'respeito_lotacao')::BOOLEAN,
+      (p_dados->>'autorizo_divulgacao')::BOOLEAN,
+      (p_dados->>'termo_compromisso_assinado')::BOOLEAN,
+      NULLIF(p_dados->>'termo_compromisso_data', '')::TIMESTAMP,
+      p_dados->>'termo_compromisso_ip',
+      (p_dados->>'current_step')::INTEGER
     )
-    ON CONFLICT (session_id) DO UPDATE SET
-        solicitante_nome = EXCLUDED.solicitante_nome,
-        solicitante_email = EXCLUDED.solicitante_email,
-        solicitante_telefone = EXCLUDED.solicitante_telefone,
-        solicitante_documento = EXCLUDED.solicitante_documento,
-        tipo_solicitante = EXCLUDED.tipo_solicitante,
-        espaco_id = EXCLUDED.espaco_id,
-        espaco_solicitado = EXCLUDED.espaco_solicitado,
-        data_pretendida = EXCLUDED.data_pretendida,
-        horario_inicio = EXCLUDED.horario_inicio,
-        horario_fim = EXCLUDED.horario_fim,
-        numero_participantes = EXCLUDED.numero_participantes,
-        descricao_evento = EXCLUDED.descricao_evento,
-        natureza_evento = EXCLUDED.natureza_evento,
-        gratuito = EXCLUDED.gratuito,
-        termo_aceito = EXCLUDED.termo_aceito,
-        current_step = EXCLUDED.current_step,
-        updated_at = NOW();
+    RETURNING id INTO v_id;
+  END IF;
+
+  RETURN v_id;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
 
 -- Buscar rascunho
 CREATE OR REPLACE FUNCTION buscar_rascunho_agendamento(p_session_id TEXT)
-RETURNS JSONB AS $$
-DECLARE
-    resultado JSONB;
+RETURNS SETOF agendamentos_rascunho AS $
 BEGIN
-    SELECT to_jsonb(row) INTO resultado
-    FROM (
-        SELECT * FROM agendamentos_rascunho
-        WHERE session_id = p_session_id
-    ) row;
-    RETURN COALESCE(resultado, '{}'::jsonb);
+  RETURN QUERY
+  SELECT * FROM agendamentos_rascunho
+  WHERE session_id = p_session_id
+  ORDER BY updated_at DESC
+  LIMIT 1;
 END;
-$$ LANGUAGE plpgsql;
+$ LANGUAGE plpgsql;
 
 -- Limpar rascunho
 CREATE OR REPLACE FUNCTION limpar_rascunho_agendamento(p_session_id TEXT)
