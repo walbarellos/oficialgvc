@@ -10,7 +10,6 @@ coverage/
 .env.local
 !.env.examplesupabase_dumpsupabase_dump/*.sql
 supabase/.temp/
-*.sql
 
 *_dump*.sql
 BACKUP_*.sql
