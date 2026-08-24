@@ -183,8 +183,8 @@ CREATE TABLE IF NOT EXISTS agendamentos (
     assinatura_id TEXT,
     ip_confirmacao TEXT,
     user_agent TEXT,
-    CHECK (tipo_solicitante IN ('escola', 'universidade', 'ong', 'empresa', 'pessoa_fisica')),
-    CHECK (tipo_espaco IN ('auditorio', 'sala_reuniao', 'area_externa', 'visita_guiada', 'outro')),
+    CHECK (tipo_solicitante IN ('escola', 'universidade', 'ong', 'empresa', 'pessoa_fisica', 'pessoa_juridica', 'governo')),
+    CHECK (tipo_espaco IN ('auditorio', 'sala_reuniao', 'sala_estudos', 'teatro', 'filmoteca', 'espaco_aberto', 'area_externa', 'visita_guiada', 'outro')),
     CHECK (natureza_evento IN ('cultural', 'educacional', 'corporativo', 'comunitario', 'outro')),
     CHECK (status IN ('pendente', 'aprovado', 'rejeitado', 'cancelado'))
 );
