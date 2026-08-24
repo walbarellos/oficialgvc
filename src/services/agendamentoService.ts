@@ -186,16 +186,12 @@ export const agendamentoService = {
 
     if (uploadError) return { data: null, error: uploadError };
 
-    const { data: urlData } = supabase.storage
-      .from('documentos-agendamentos')
-      .getPublicUrl(fileName);
-
     const { data: docData, error: docError } = await supabase
       .from('documentos_agendamento')
       .insert({
         agendamento_id: agendamentoId,
         nome_arquivo: arquivo.name,
-        url_arquivo: urlData.publicUrl,
+        url_arquivo: fileName, // Armazena o path relativo para usar com createSignedUrl depois
         tipo_documento: tipo,
       })
       .select()
