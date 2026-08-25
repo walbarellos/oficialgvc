@@ -11,6 +11,8 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, right: 0 });
   const { userData } = useAuth();
   
   const isAdmin = userData?.perfil === 'administrador';
@@ -46,7 +48,10 @@ export default function NotificationBell() {
   
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current && !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -55,6 +60,13 @@ export default function NotificationBell() {
   }, []);
 
   const handleOpen = () => {
+    if (!isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
     setIsOpen(!isOpen);
     if (!isOpen) {
       setUnreadCount(0);
@@ -65,8 +77,9 @@ export default function NotificationBell() {
   if (!isAdmin) return null;
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative">
       <button 
+        ref={buttonRef}
         onClick={handleOpen}
         type="button"
         className="text-slate-400 hover:text-primary transition-colors p-2 hover:bg-slate-50 rounded-full relative"
@@ -80,11 +93,13 @@ export default function NotificationBell() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            ref={dropdownRef}
+            initial={{ opacity: 0, y: -8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            exit={{ opacity: 0, y: -8, scale: 0.95 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right text-left"
+            style={{ top: dropdownPos.top, right: dropdownPos.right }}
+            className="fixed w-80 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-[9999] origin-top-right text-left"
           >
             <div className="p-4 border-b border-slate-50 flex items-center justify-between bg-slate-50">
               <h3 className="font-bold text-slate-900">Notificações de Sistema</h3>
