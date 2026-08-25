@@ -29,8 +29,8 @@ BEGIN
     )
     VALUES (
         v_espaco_id, '[TESTE] Carlos Sousa', 'teste@teste.com', '999999999', 
-        'Pessoa Física', 'Auditório', 'Auditório Principal', current_date + interval '2 days', 
-        '14:00', '16:00', 50, 'Estudo Dirigido', 'Cultural', 'confirmado'
+        'pessoa_fisica', 'auditorio', 'Auditório Principal', current_date + interval '2 days', 
+        '14:00', '16:00', 50, 'Estudo Dirigido', 'cultural', 'aprovado'
     );
 
     -- 4. RELATÓRIOS (Visitas Passadas Concluídas)
