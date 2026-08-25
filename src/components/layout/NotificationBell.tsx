@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
@@ -90,7 +91,8 @@ export default function NotificationBell() {
         )}
       </button>
 
-      <AnimatePresence>
+      {ReactDOM.createPortal(
+        <AnimatePresence>
         {isOpen && (
           <motion.div
             ref={dropdownRef}
@@ -150,11 +152,13 @@ export default function NotificationBell() {
             <div className="p-3 border-t border-slate-50 bg-slate-50/50">
                <button type="button" onClick={() => navigate('/auditoria')} className="text-xs font-bold text-primary w-full text-center hover:text-blue-700 transition-colors">
                   Ver registro completo
-               </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                </button>
+             </div>
+           </motion.div>
+         )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
