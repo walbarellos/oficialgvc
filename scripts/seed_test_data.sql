@@ -47,8 +47,8 @@ BEGIN
 
     -- 6. LOCKERS (Armários) E TELECENTRO (Computadores)
     -- Simulando a ocupação física no Telecentro e do armário
-    INSERT INTO computadores (numero, status, usuario_id, usuario_nome, horario_inicio, espaco_id)
-    VALUES (1, 'Em Uso', v_visitor3, '[TESTE] Carlos Sousa', now(), v_espaco_id);
+    INSERT INTO computadores (numero, status, usuario_id, usuario_nome, horario_inicio, horario_limite, espaco_id)
+    VALUES (1, 'Em Uso', v_visitor3, '[TESTE] Carlos Sousa', now(), now() + interval '1 hour', v_espaco_id);
 
     INSERT INTO lockers (number, status, visitor_id, visitor_name, espaco_id)
     VALUES (1, 'Ocupado', v_visitor3, '[TESTE] Carlos Sousa', v_espaco_id);
