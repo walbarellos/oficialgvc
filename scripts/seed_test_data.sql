@@ -55,7 +55,7 @@ BEGIN
 
     -- 7. AUDITORIA
     -- Registra o que aconteceu para o painel de auditoria
-    INSERT INTO auditoria (acao, detalhes, espaco_id)
-    VALUES ('criou_usuario', '[TESTE] Dados simulados foram injetados no sistema para homologação.', v_espaco_id);
+    INSERT INTO auditoria (usuario, acao, detalhes, entidade_id)
+    VALUES ('Sistema', 'criou_usuario', '[TESTE] Dados simulados foram injetados no sistema para homologação.', v_espaco_id::TEXT);
 
 END $$;
