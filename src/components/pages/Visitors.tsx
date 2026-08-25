@@ -267,7 +267,7 @@ const mapped = data.map(d => ({
     try {
       const { data } = await supabase
         .from('visits')
-        .select('*')
+        .select('*, visitors(full_name, cpf, passport, is_foreigner, birth_date)')
         .eq('status', 'Ativo')
         .order('checkin', { ascending: false });
       setActiveVisits(data || []);
@@ -331,7 +331,7 @@ const mapped = data.map(d => ({
                 <div key={visit.id} className="bg-white border border-purple-100 rounded-lg p-3 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm">{visit.nome}</p>
+                      <p className="font-semibold text-gray-900 text-sm">{(visit as any).visitors?.full_name || visit.nome}</p>
                       <p className="text-xs text-gray-500">{visit.local}</p>
                       <p className="text-xs text-purple-600 mt-1">
                         Check-in: {visit.checkin ? new Date(visit.checkin).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-'}

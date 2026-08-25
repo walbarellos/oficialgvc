@@ -24,8 +24,9 @@ export function normalizarVisita(doc: any) {
   const data = doc.data ? doc.data() : doc;
   const id = doc.id || data.id;
 
-  // Normalização de Nome
-  const nome = data.nome || data.visitorName || data.fullName || "Desconhecido";
+  // Normalização de Nome — prioriza o nome atual do cadastro (JOIN visitors)
+  // para que edições no cadastro reflitam em todos os registros de visita
+  const nome = data.visitors?.full_name || data.nome || data.visitorName || data.fullName || "Desconhecido";
   
   // Normalização de Perfil/Categoria
   const perfil = data.perfil || data.category || data.profile || "general";
