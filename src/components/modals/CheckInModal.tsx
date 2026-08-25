@@ -98,6 +98,12 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
       newErrors.phone = 'Telefone inválido';
     }
 
+    
+    if (isMinor(formData.birthDate)) {
+      if (!formData.responsibleName.trim()) newErrors.responsibleName = 'Nome do Responsável é obrigatório para menores';
+      if (!formData.responsibleCpf.trim()) newErrors.responsibleCpf = 'CPF do Responsável é obrigatório para menores';
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -375,6 +381,51 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
                   </div>
                 </div>
               </div>
+
+              
+              {isMinor(formData.birthDate) && (
+                <div className="p-4 bg-amber-50 rounded-xl border border-amber-200 mt-2 space-y-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-amber-800 font-bold text-sm uppercase tracking-widest flex items-center gap-2">
+                      <AlertTriangle size={16} /> Visitante Menor de Idade
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-amber-900 uppercase tracking-widest flex items-center gap-1">
+                        Responsável Legal <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="responsibleName"
+                        value={formData.responsibleName}
+                        onChange={e => setFormData({ ...formData, responsibleName: e.target.value })}
+                        className={`w-full px-4 py-2 bg-white border ${errors.responsibleName ? 'border-red-300 ring-red-100' : 'border-amber-200'} rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-400 outline-none transition-all text-sm font-medium`}
+                        placeholder="Nome completo do responsável"
+                      />
+                      {errors.responsibleName && <p className="text-red-500 text-xs mt-1">{errors.responsibleName}</p>}
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-bold text-amber-900 uppercase tracking-widest flex items-center gap-1">
+                        CPF do Responsável <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="responsibleCpf"
+                        value={formData.responsibleCpf}
+                        onChange={e => setFormData({ ...formData, responsibleCpf: e.target.value })}
+                        className={`w-full px-4 py-2 bg-white border ${errors.responsibleCpf ? 'border-red-300 ring-red-100' : 'border-amber-200'} rounded-xl focus:ring-4 focus:ring-amber-100 focus:border-amber-400 outline-none transition-all text-sm font-medium`}
+                        placeholder="000.000.000-00"
+                      />
+                      {errors.responsibleCpf && <p className="text-red-500 text-xs mt-1">{errors.responsibleCpf}</p>}
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 mt-2">
+                    <input type="checkbox" checked={true} readOnly className="mt-1" />
+                    <p className="text-xs text-amber-700">Declaro ter autorização do responsável legal para o cadastro e permanência do menor neste espaço cultural.</p>
+                  </div>
+                </div>
+              )}
 
               <div className="mt-8 pt-8 border-t border-slate-200">
                 <div className="flex flex-col gap-2">
