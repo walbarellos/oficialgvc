@@ -45,7 +45,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
         email: visitorToEdit.email || '',
         phone: visitorToEdit.phone || '',
         address: (visitorToEdit as any).address || '',
-        category: visitorToEdit.category
+        category: visitorToEdit.category, parentalAuthorization: visitorToEdit.parental_authorization || false, responsibleName: visitorToEdit.responsible_name || '', responsibleCpf: visitorToEdit.responsible_cpf || ''
       });
     } else {
       setFormData({

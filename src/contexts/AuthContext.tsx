@@ -55,7 +55,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (session?.user) {
-        setLoading(true);
+        // Only show full-screen loading if we don't have user data yet
+        if (!userData) {
+          setLoading(true);
+        }
         // Fetch user data
         const { data: uData, error: uError } = await supabase
           .from('usuarios')
