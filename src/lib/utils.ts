@@ -51,7 +51,18 @@ export function normalizarVisita(doc: any) {
     status,
     checkin,
     checkout,
-    espacoId: data.espacoId || data.espaco_id || "desconhecido"
+    espacoId: data.espacoId || data.espaco_id || "desconhecido",
+    isMinor: (() => {
+      if (!data.visitors?.birth_date) return false;
+      const today = new Date();
+      const dob = new Date(data.visitors.birth_date);
+      let age = today.getFullYear() - dob.getFullYear();
+      const m = today.getMonth() - dob.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+        age--;
+      }
+      return age < 18;
+    })()
   };
 }
 

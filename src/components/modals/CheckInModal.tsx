@@ -23,7 +23,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
     email: '',
     phone: '',
     address: '',
-    category: VisitorCategory.GENERAL,
+    category: VisitorCategory.GENERAL, parentalAuthorization: false, responsibleName: '', responsibleCpf: '',
     parentalAuthorization: false,
     responsibleName: '',
     responsibleCpf: ''
@@ -58,7 +58,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
         email: '',
         phone: '',
         address: '',
-        category: VisitorCategory.GENERAL
+        category: VisitorCategory.GENERAL, parentalAuthorization: false, responsibleName: '', responsibleCpf: ''
       });
     }
     setErrors({});

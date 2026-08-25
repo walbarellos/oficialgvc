@@ -65,7 +65,10 @@ const mapped = data.map(d => ({
          email: d.email,
          phone: d.phone,
          birthDate: d.birth_date,
-         address: d.address
+         address: d.address,
+         parentalAuthorization: d.parental_authorization,
+         responsibleName: d.responsible_name,
+         responsibleCpf: d.responsible_cpf
        })) as Visitor[];
        setVisitors(mapped);
      } catch (err) {
@@ -108,6 +111,18 @@ const mapped = data.map(d => ({
         console.error("Erro ao deletar", error);
       }
     }
+  };
+
+  const isMinor = (birthDate?: string) => {
+    if (!birthDate) return false;
+    const today = new Date();
+    const dob = new Date(birthDate);
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age < 18;
   };
 
   const handleEdit = (visitor: Visitor) => {
@@ -432,7 +447,14 @@ const mapped = data.map(d => ({
                         )}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">{visitor.fullName}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-gray-900">{visitor.fullName}</p>
+                          {isMinor(visitor.birthDate) && (
+                            <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">
+                              MENOR
+                            </span>
+                          )}
+                        </div>
                         <div className="flex items-center gap-2">
                           <p className="text-xs font-mono text-gray-400">
                             {visitor.isForeigner 

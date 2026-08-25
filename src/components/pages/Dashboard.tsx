@@ -52,7 +52,7 @@ export default function Dashboard() {
       const { count: countToday } = await visitsQuery;
 
       let activeQuery = supabase.from('visits')
-        .select('*, visitors(full_name, cpf, passport, is_foreigner)')
+        .select('*, visitors(full_name, cpf, passport, is_foreigner, birth_date)')
         .in('status', ['Ativo', 'Excedido']);
       
       if (!isGlobalAdmin && userData.espacoId) {
@@ -69,7 +69,7 @@ export default function Dashboard() {
       const occupiedLockersCount = lockersCount || 0;
 
       let historyQuery = supabase.from('visits')
-        .select('*, visitors(full_name, cpf, passport, is_foreigner)')
+        .select('*, visitors(full_name, cpf, passport, is_foreigner, birth_date)')
         .order('checkin', { ascending: false })
         .limit(5);
       
@@ -237,7 +237,10 @@ export default function Dashboard() {
                     {visit.nome.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 text-sm truncate">{visit.nome}</p>
+                    <p className="font-bold text-gray-900 text-sm truncate flex items-center gap-2">
+                      {visit.nome}
+                      {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">MENOR</span>}
+                    </p>
                     <p className="text-[10px] text-gray-400 flex items-center gap-1 font-bold uppercase tracking-wide">
                       <MapPin size={10} className="text-primary" /> {visit.local}
                       <span className="mx-1">•</span>
