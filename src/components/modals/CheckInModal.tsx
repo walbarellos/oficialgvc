@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, User, Globe, Heart, Mail, Phone, Camera, CheckCircle2 } from 'lucide-react';
+import { X, AlertTriangle, User, Globe, Heart, Mail, Phone, Camera, CheckCircle2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { visitorService } from '../../services/visitorService';
 import { VisitorCategory, OperationType, Gender, Visitor } from '../../types';
@@ -23,7 +23,10 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
     email: '',
     phone: '',
     address: '',
-    category: VisitorCategory.GENERAL
+    category: VisitorCategory.GENERAL,
+    parentalAuthorization: false,
+    responsibleName: '',
+    responsibleCpf: ''
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
@@ -60,6 +63,18 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
     }
     setErrors({});
   }, [visitorToEdit, isOpen]);
+
+  const isMinor = (birthDate: string) => {
+    if (!birthDate) return false;
+    const today = new Date();
+    const dob = new Date(birthDate);
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age < 18;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -115,7 +130,11 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
         email: formData.email,
         phone: cleanPhone,
         address: formData.address,
-        category: formData.category
+        category: formData.category,
+        parental_authorization: isMinor(formData.birthDate) ? true : false,
+        responsible_name: isMinor(formData.birthDate) ? formData.responsibleName : null,
+        responsible_cpf: isMinor(formData.birthDate) ? formData.responsibleCpf : null,
+        authorization_date: isMinor(formData.birthDate) ? new Date().toISOString() : null
       };
 
       // Usa visitorService para criar ou atualizar
@@ -129,7 +148,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
       setTimeout(() => {
         setSuccess(false);
         onClose();
-        setFormData({ fullName: '', cpf: '', passport: '', isForeigner: false, gender: Gender.MALE, birthDate: '', email: '', phone: '', address: '', category: VisitorCategory.GENERAL });
+        setFormData({ fullName: '', cpf: '', passport: '', isForeigner: false, gender: Gender.MALE, birthDate: '', email: '', phone: '', address: '', category: VisitorCategory.GENERAL, parentalAuthorization: false, responsibleName: '', responsibleCpf: '' });
       }, 2000);
     } catch (error: any) {
       setErrorMsg(error.message || String(error));

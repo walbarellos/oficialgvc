@@ -23,6 +23,10 @@ export interface Visitor {
   createdAt: string;
   birthDate?: string;
   address?: string;
+  parental_authorization?: boolean;
+  responsible_name?: string;
+  responsible_cpf?: string;
+  authorization_date?: string;
 }
 
 export enum LockerStatus {

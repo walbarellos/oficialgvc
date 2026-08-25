@@ -1,0 +1,5 @@
+ALTER TABLE visitors 
+ADD COLUMN IF NOT EXISTS parental_authorization BOOLEAN DEFAULT false,
+ADD COLUMN IF NOT EXISTS responsible_name TEXT,
+ADD COLUMN IF NOT EXISTS responsible_cpf TEXT,
+ADD COLUMN IF NOT EXISTS authorization_date TIMESTAMPTZ;
