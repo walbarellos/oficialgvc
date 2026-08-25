@@ -237,7 +237,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
         />
         <motion.div 
@@ -253,7 +253,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
               </h2>
               <p className="text-xs text-slate-500 font-medium mt-1">Configure as informações e limites desta unidade.</p>
             </div>
-            <button onClick={onClose} className="p-2 hover:bg-slate-50 rounded-full transition-colors">
+            <button  className="p-2 hover:bg-slate-50 rounded-full transition-colors">
               <X size={20} className="text-slate-400" />
             </button>
           </div>
@@ -576,7 +576,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
           <div className="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-3xl shrink-0 flex gap-3">
             <button 
               type="button"
-              onClick={onClose}
+              
               className="flex-1 py-3.5 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-50 transition-all"
             >
               Cancelar

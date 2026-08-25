@@ -197,7 +197,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={onClose}
+          
           className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
         />
         <motion.div 
@@ -210,7 +210,7 @@ export default function UserModal({ isOpen, onClose, userToEdit }: UserModalProp
             <h2 className="text-xl font-display font-bold text-slate-900">
               {userToEdit ? 'Editar Usuário' : 'Novo Usuário do Sistema'}
             </h2>
-            <button onClick={onClose} className="p-2 hover:bg-slate-200 rounded-full transition-all">
+            <button  className="p-2 hover:bg-slate-200 rounded-full transition-all">
               <X size={20} className="text-slate-500" />
             </button>
           </div>
