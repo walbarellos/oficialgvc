@@ -700,7 +700,7 @@ export default function Reports() {
                           </div>
                           <div className="flex items-center gap-2">
                             <span className="font-sans font-semibold text-gray-900">{visit.nome}</span>
-                            {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">MENOR</span>}
+                            {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">INFANTOJUVENIL</span>}
                           </div>
                         </div>
                       </td>

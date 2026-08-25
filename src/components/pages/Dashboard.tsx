@@ -239,7 +239,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <p className="font-bold text-gray-900 text-sm truncate flex items-center gap-2">
                       {visit.nome}
-                      {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">MENOR</span>}
+                      {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">INFANTOJUVENIL</span>}
                     </p>
                     <p className="text-[10px] text-gray-400 flex items-center gap-1 font-bold uppercase tracking-wide">
                       <MapPin size={10} className="text-primary" /> {visit.local}
