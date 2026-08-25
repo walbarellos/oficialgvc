@@ -217,6 +217,17 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
     }
   };
 
+  
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

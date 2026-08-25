@@ -23,6 +23,17 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   confirmText = "Confirmar",
   confirmVariant = 'danger'
 }) => {
+  
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

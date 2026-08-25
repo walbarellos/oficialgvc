@@ -310,6 +310,16 @@ export default function Telecentro() {
     );
   }
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsSearchOpen(false);
+    };
+    if (isSearchOpen) {
+      window.addEventListener('keydown', handleEsc);
+    }
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isSearchOpen]);
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       {toast && (
