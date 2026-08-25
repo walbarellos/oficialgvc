@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
