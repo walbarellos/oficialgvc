@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  X, 
+  X, AlertCircle, 
   MapPin, 
   Mail, 
   Clock, 

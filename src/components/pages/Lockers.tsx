@@ -254,11 +254,11 @@ export default function Lockers() {
         <div className="flex gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-bold font-mono">
             <CheckCircle2 size={14} />
-            {lockers.filter(l => l.status === 'available').length} LIVRES
+            {lockers.filter(l => l.status === 'Livre').length} LIVRES
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-amber-50 border border-amber-100 text-amber-700 text-xs font-bold font-mono">
             <Lock size={14} />
-            {lockers.filter(l => l.status === 'occupied').length} OCUPADOS
+            {lockers.filter(l => l.status === 'Ocupado').length} OCUPADOS
           </div>
         </div>
       </div>

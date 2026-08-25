@@ -9,7 +9,10 @@ export type AuditoriaAcao =
   | "editou_espaco" 
   | "alterou_configuracoes" 
   | "exportou_backup" 
-  | "excluiu_visita";
+  | "excluiu_visita"
+  | "aprovado_agendamento"
+  | "rejeitado_agendamento"
+  | "exclusao_agendamento";
 
 interface AuditLogParams {
   acao: AuditoriaAcao;
