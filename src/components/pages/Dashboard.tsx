@@ -61,7 +61,12 @@ export default function Dashboard() {
       
       const { data: activeData } = await activeQuery;
       const activeVisitsCount = activeData?.length || 0;
-      const occupiedLockersCount = activeData?.filter(d => d.armario).length || 0;
+      let lockersQuery = supabase.from('lockers').select('id', { count: 'exact', head: true }).eq('status', 'Ocupado');
+      if (!isGlobalAdmin && userData.espacoId) {
+        lockersQuery = lockersQuery.eq('espaco_id', userData.espacoId);
+      }
+      const { count: lockersCount } = await lockersQuery;
+      const occupiedLockersCount = lockersCount || 0;
 
       let historyQuery = supabase.from('visits')
         .select('*, visitors(full_name, cpf, passport, is_foreigner)')
