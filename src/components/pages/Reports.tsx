@@ -101,7 +101,7 @@ export default function Reports() {
 
   useEffect(() => {
     const fetchConfigAndLocations = async () => {
-      const { data: configData } = await supabase.from('configuracoes').select('*').eq('id', 'sistema').single();
+      const { data: configData } = await supabase.from('configuracoes').select('*').eq('id', 'sistema').maybeSingle();
       if (configData) setConfig(configData.data || {});
 
       const { data: locData } = await supabase.from('espacos').select('*').order('nome');

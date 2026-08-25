@@ -25,12 +25,12 @@ BEGIN
     INSERT INTO agendamentos (
         espaco_id, solicitante_nome, solicitante_email, solicitante_telefone, 
         tipo_solicitante, tipo_espaco, espaco_solicitado, data_pretendida, 
-        horario_inicio, horario_fim, numero_participantes, descricao_evento, status
+        horario_inicio, horario_fim, numero_participantes, descricao_evento, natureza_evento, status
     )
     VALUES (
         v_espaco_id, '[TESTE] Carlos Sousa', 'teste@teste.com', '999999999', 
         'Pessoa Física', 'Auditório', 'Auditório Principal', current_date + interval '2 days', 
-        '14:00', '16:00', 50, 'Estudo Dirigido', 'confirmado'
+        '14:00', '16:00', 50, 'Estudo Dirigido', 'Cultural', 'confirmado'
     );
 
     -- 4. RELATÓRIOS (Visitas Passadas Concluídas)
