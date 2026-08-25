@@ -55,10 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (session?.user) {
-        // Only show full-screen loading if we don't have user data yet
-        if (!userData) {
-          setLoading(true);
-        }
+        // A tela de loading inicial já começa como true no useState.
+        // Não reativamos o loading em renovações de token (onAuthStateChange)
+        // para evitar unmount da tela e perda de dados em formulários (stale closure bug).
         // Fetch user data
         const { data: uData, error: uError } = await supabase
           .from('usuarios')
