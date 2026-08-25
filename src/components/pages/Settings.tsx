@@ -173,7 +173,7 @@ export default function Settings() {
         </button>
       </div>
 
-      <div className="bg-white min-h-[400px]">
+      <div className="min-h-[400px] mt-6">
         {activeTab === 'espacos' && (
           <motion.div animate={{ opacity: 1, y: 0 }} initial={{ opacity: 0, y: 10 }}>
             <SpacesTab />
