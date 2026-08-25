@@ -155,13 +155,9 @@ export default function Telecentro() {
     const targetEspacoId = isGlobalAdmin ? null : userData.espacoId;
 
     try {
-      const { data: activeCheckIn } = await supabase
-        .from('visits')
-        .select('id, local')
-        .eq('visitor_id', visitante.id)
-        .eq('status', 'Ativo')
-        .eq('espaco_id', targetEspacoId)
-        .limit(1);
+      let q = supabase.from('visits').select('id, local').eq('visitor_id', visitante.id).eq('status', 'Ativo');
+      if (targetEspacoId) q = q.eq('espaco_id', targetEspacoId);
+      const { data: activeCheckIn } = await q.limit(1);
       
       if (!activeCheckIn || activeCheckIn.length === 0) {
         setToast({ 
