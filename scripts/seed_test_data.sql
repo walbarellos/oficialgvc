@@ -14,16 +14,24 @@ BEGIN
     END IF;
 
     -- 2. CADASTRO DE VISITANTES (Brazucas e Estrangeiros)
-    INSERT INTO visitors (id, full_name, cpf, passport, is_foreigner, tipo_solicitante)
+    INSERT INTO visitors (id, full_name, cpf, passport, is_foreigner, category)
     VALUES 
     (v_visitor1, '[TESTE] Ana Silva', '999.999.999-01', NULL, false, 'Pesquisador'),
     (v_visitor2, '[TESTE] John Doe (Gringo)', NULL, 'USA-9999', true, 'Turista Estrangeiro'),
-    (v_visitor3, '[TESTE] Carlos Sousa', '999.999.999-02', NULL, false, 'Público Geral');
+    (v_visitor3, '[TESTE] Carlos Sousa', '999.999.999-02', NULL, false, 'general');
 
     -- 3. AGENDAMENTO
     -- Um agendamento para o futuro para aparecer na aba de agendamentos
-    INSERT INTO agendamentos (visitante_id, espaco_id, data_agendamento, hora_inicio, hora_fim, status, finalidade)
-    VALUES (v_visitor3, v_espaco_id, current_date + interval '2 days', '14:00', '16:00', 'confirmado', 'Estudo Dirigido');
+    INSERT INTO agendamentos (
+        espaco_id, solicitante_nome, solicitante_email, solicitante_telefone, 
+        tipo_solicitante, tipo_espaco, espaco_solicitado, data_pretendida, 
+        horario_inicio, horario_fim, numero_participantes, descricao_evento, status
+    )
+    VALUES (
+        v_espaco_id, '[TESTE] Carlos Sousa', 'teste@teste.com', '999999999', 
+        'Pessoa Física', 'Auditório', 'Auditório Principal', current_date + interval '2 days', 
+        '14:00', '16:00', 50, 'Estudo Dirigido', 'confirmado'
+    );
 
     -- 4. RELATÓRIOS (Visitas Passadas Concluídas)
     -- Inserindo visitas de dias anteriores para gerar gráficos e relatórios
@@ -35,17 +43,15 @@ BEGIN
     -- 5. CHECK-IN ATIVO COM ARMÁRIO
     -- Carlos está no espaço AGORA
     INSERT INTO visits (id, visitor_id, nome, espaco_id, checkin, status, perfil, local, armario)
-    VALUES (v_visit1, v_visitor3, '[TESTE] Carlos Sousa', v_espaco_id, now(), 'Ativo', 'Público Geral', 'Telecentro', '99');
+    VALUES (v_visit1, v_visitor3, '[TESTE] Carlos Sousa', v_espaco_id, now(), 'Ativo', 'general', 'Telecentro', '99');
 
     -- 6. LOCKERS (Armários) E TELECENTRO (Computadores)
     -- Simulando a ocupação física no Telecentro e do armário
-    INSERT INTO computadores (numero, status, usuario_id, inicio_uso, espaco_id)
-    VALUES ('PC-TESTE-99', 'ocupado', v_visitor3, now(), v_espaco_id);
+    INSERT INTO computadores (numero, status, usuario_id, usuario_nome, horario_inicio, espaco_id)
+    VALUES (999, 'Em Uso', v_visitor3, '[TESTE] Carlos Sousa', now(), v_espaco_id);
 
-    INSERT INTO lockers (numero, status, visitor_id, espaco_id, occupied_at)
-    VALUES ('99', 'ocupado', v_visitor3, v_espaco_id, now())
-    ON CONFLICT (espaco_id, numero) DO UPDATE 
-    SET status = 'ocupado', visitor_id = EXCLUDED.visitor_id, occupied_at = EXCLUDED.occupied_at;
+    INSERT INTO lockers (number, status, visitor_id, visitor_name, espaco_id)
+    VALUES (99, 'Ocupado', v_visitor3, '[TESTE] Carlos Sousa', v_espaco_id);
 
     -- 7. AUDITORIA
     -- Registra o que aconteceu para o painel de auditoria
