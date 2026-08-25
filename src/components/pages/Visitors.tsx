@@ -451,7 +451,7 @@ const mapped = data.map(d => ({
                           <p className="font-semibold text-gray-900">{visitor.fullName}</p>
                           {isMinor(visitor.birthDate) && (
                             <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">
-                              MENOR
+                              INFANTOJUVENIL
                             </span>
                           )}
                         </div>
