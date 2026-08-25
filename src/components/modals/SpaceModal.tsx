@@ -37,6 +37,7 @@ const MUNICIPARIOS_ACRE = [
 const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit }) => {
   const { userData: currentAdmin } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
   const [municipioSearch, setMunicipioSearch] = useState('');
   const [showMunicipioList, setShowMunicipioList] = useState(false);
 
@@ -72,7 +73,7 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
   });
 
   useEffect(() => {
-    setErrorMsg('');
+    
     if (spaceToEdit) {
       setFormData({
         nome: spaceToEdit.nome || '',
@@ -246,6 +247,12 @@ const SpaceModal: React.FC<SpaceModalProps> = ({ isOpen, onClose, spaceToEdit })
             </button>
           </div>
 
+          {errorMsg && (
+            <div className="mx-6 mt-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+              <AlertCircle className="text-red-600 shrink-0 mt-0.5" size={18} />
+              <p className="text-sm font-medium text-red-900">{errorMsg}</p>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="overflow-y-auto p-6 space-y-8 pb-10 scrollbar-hide">
             {/* Seção 1: Dados do Espaço */}
             <div className="text-left">
