@@ -209,6 +209,30 @@ export default function Telecentro() {
     }
   };
 
+  
+  const renovarTempo = async (computador: Computador) => {
+    if (!computador.horarioLimite) return;
+    
+    try {
+      const limiteAtual = new Date(computador.horarioLimite);
+      // Adiciona 30 minutos ao limite atual
+      const novoLimite = new Date(limiteAtual.getTime() + 30 * 60000);
+      
+      const { error } = await supabase.from('computadores')
+        .update({ horario_limite: novoLimite.toISOString() })
+        .eq('id', computador.id);
+        
+      if (error) throw error;
+      
+      setToast({ message: `+30 minutos adicionados ao PC ${computador.numero}!`, type: 'success' });
+      setTimeout(() => setToast(null), 3000);
+    } catch (error) {
+      console.error(error);
+      setToast({ message: "Erro ao renovar tempo.", type: 'error' });
+      setTimeout(() => setToast(null), 4000);
+    }
+  };
+
   const liberarComputador = async (computadorId: string) => {
     try {
       await supabase.from('computadores').delete().eq('id', computadorId);
@@ -407,14 +431,25 @@ export default function Telecentro() {
                       Iniciar Uso
                     </button>
                   ) : (
-                    <button
-                      onClick={() => liberarComputador(computador.id)}
-                      className="relative z-50 w-full px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2 shadow-sm"
-                      type="button"
-                    >
-                      <Unlock className="w-4 h-4" />
-                      Liberar Computador
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => renovarTempo(computador)}
+                        className="relative z-50 flex-1 px-3 py-2.5 bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm text-xs"
+                        type="button"
+                        title="Adicionar +30 min"
+                      >
+                        <Clock className="w-4 h-4" />
+                        +30m
+                      </button>
+                      <button
+                        onClick={() => liberarComputador(computador.id)}
+                        className="relative z-50 flex-[2] px-3 py-2.5 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm text-xs"
+                        type="button"
+                      >
+                        <Unlock className="w-4 h-4" />
+                        Liberar PC
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
