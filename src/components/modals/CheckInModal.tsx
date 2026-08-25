@@ -23,7 +23,7 @@ export default function CheckInModal({ isOpen, onClose, visitorToEdit }: CheckIn
     email: '',
     phone: '',
     address: '',
-    category: VisitorCategory.GENERAL, parentalAuthorization: false, responsibleName: '', responsibleCpf: '',
+    category: VisitorCategory.GENERAL,
     parentalAuthorization: false,
     responsibleName: '',
     responsibleCpf: ''

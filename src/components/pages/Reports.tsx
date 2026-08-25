@@ -135,7 +135,7 @@ export default function Reports() {
   const fetchVisits = async () => {
     setLoading(true);
     try {
-      let q = supabase.from('visits').select('*').limit(1000)
+      let q = supabase.from('visits').select('*, visitors(full_name, cpf, passport, is_foreigner, birth_date)').limit(1000)
         .gte('checkin', new Date(startDate + 'T00:00:00').toISOString())
         .lte('checkin', new Date(endDate + 'T23:59:59').toISOString())
         .order('checkin', { ascending: false });
@@ -698,7 +698,10 @@ export default function Reports() {
                           <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
                             {getInitials(visit.nome)}
                           </div>
-                          <span className="font-sans font-semibold text-gray-900">{visit.nome}</span>
+                          <div className="flex items-center gap-2">
+                            <span className="font-sans font-semibold text-gray-900">{visit.nome}</span>
+                            {visit.isMinor && <span className="bg-amber-100 text-amber-800 text-[9px] px-1.5 py-0.5 rounded-sm font-bold tracking-widest border border-amber-200">MENOR</span>}
+                          </div>
                         </div>
                       </td>
                       <td className="px-6 py-4">

@@ -56,6 +56,7 @@ export interface Visit {
   checkOutTime?: string;
   location: string;
   status: VisitStatus;
+  isMinor?: boolean;
 }
 
 export enum OperationType {
