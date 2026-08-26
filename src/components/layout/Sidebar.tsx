@@ -70,15 +70,17 @@ export default function Sidebar({ onNewCheckIn }: SidebarProps) {
   return (
     <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 flex flex-col z-50">
       <div className="p-6 mb-4">
-        <div className="flex items-center gap-3 mb-1">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center text-white font-bold shrink-0">
             G
           </div>
-          <span className="font-display font-bold text-lg text-gray-900">GVC</span>
+          <div className="flex flex-col">
+            <span className="font-display font-bold text-lg text-gray-900 leading-tight">GVC</span>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 leading-tight">
+              {userData?.espacoId === 'todos' || !userData?.espacoId ? 'Gestão Cultural' : userData?.espacoNome}
+            </p>
+          </div>
         </div>
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 pl-11">
-          {userData?.espacoId === 'todos' || !userData?.espacoId ? 'Gestão Cultural' : userData?.espacoNome}
-        </p>
       </div>
 
       <div className="px-4 mb-6">
