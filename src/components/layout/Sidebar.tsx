@@ -121,11 +121,13 @@ export default function Sidebar({ onNewCheckIn }: SidebarProps) {
           <span className={`inline-flex items-center w-fit px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider text-white shadow-sm ${
             userData?.perfil === "administrador" ? "bg-purple-600 shadow-purple-100" :
             userData?.perfil === "coordenador" ? "bg-blue-600 shadow-blue-100" :
+            userData?.perfil === "operador" ? "bg-green-700 shadow-green-100" :
             userData?.perfil === "monitor" ? "bg-orange-500 shadow-orange-100" :
             "bg-green-600 shadow-green-100"
           }`}>
             {userData?.perfil === "administrador" ? "Administrador" :
              userData?.perfil === "coordenador" ? "Coordenador" :
+             userData?.perfil === "operador" ? "Operador" :
              userData?.perfil === "monitor" ? "Monitor" :
              "Funcionário"}
           </span>

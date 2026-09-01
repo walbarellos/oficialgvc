@@ -149,9 +149,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAdmin = userData?.perfil === 'administrador';
   const isCoordinator = userData?.perfil === 'coordenador' || isAdmin;
-  const isStaff = userData?.perfil === 'funcionario' || isCoordinator;
-  const isInternalUser = ['administrador', 'coordenador', 'funcionario', 'monitor'].includes(userData?.perfil || '');
-  
+  // Todos os perfis internos operacionais podem fazer check-in
+  const isStaff = ['funcionario', 'operador', 'monitor', 'coordenador', 'administrador'].includes(userData?.perfil || '');
+  const isInternalUser = ['administrador', 'coordenador', 'operador', 'monitor', 'funcionario'].includes(userData?.perfil || '');
+
   const isMonitor = userData?.perfil === 'monitor' || isAdmin;
   const isSuperadmin = isAdmin;
   const isCitizen = !isInternalUser;
@@ -173,12 +174,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     const permissionKey = pathMap[p] || p;
 
+    // Hierarquia de permissões por perfil
+    // administrador: tudo (tratado acima)
+    // coordenador: gestão completa do espaço + relatórios (sem configurações globais)
+    // operador: operacional completo (sem relatórios)
+    // monitor: foco em telecentro + visitantes + agendamento (sem armários)
+    // funcionario: operacional completo (sem relatórios)
     const PERMISSIONS: Record<string, string[]> = {
-      coordenador: ["painel", "visitantes", "relatorios"],
-      funcionario: ["painel", "visitantes", "armarios"],
-      monitor: ["painel", "telecentro"]
+      // Relatórios: apenas coordenador e administrador
+      // Configurações: apenas administrador (tratado em App.tsx via requiredRole)
+      coordenador: ["painel", "visitantes", "armarios", "telecentro", "agendamento", "relatorios"],
+      operador:    ["painel", "visitantes", "armarios", "telecentro", "agendamento"],
+      monitor:     ["painel", "visitantes", "armarios", "telecentro", "agendamento"],
+      funcionario: ["painel", "visitantes", "armarios", "telecentro", "agendamento"],
     };
-
+    
     const perfil = userData?.perfil || 'vazio';
     const allowed = PERMISSIONS[perfil] || [];
     

@@ -3,10 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import { DashboardSkeleton } from './ui/Skeleton';
 
 const ROLE_HIERARCHY: Record<string, string[]> = {
-  'monitor': ['monitor'],
-  'funcionario': ['funcionario', 'coordenador', 'administrador'],
-  'coordenador': ['coordenador', 'administrador'],
-  'administrador': ['administrador']
+  'funcionario':    ['funcionario', 'operador', 'monitor', 'coordenador', 'administrador'],
+  'operador':       ['operador', 'coordenador', 'administrador'],
+  'monitor':        ['monitor', 'coordenador', 'administrador'],
+  'coordenador':    ['coordenador', 'administrador'],
+  'administrador':  ['administrador']
 };
 
 interface ProtectedRouteProps {
