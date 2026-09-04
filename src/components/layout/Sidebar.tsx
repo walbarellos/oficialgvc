@@ -42,14 +42,15 @@ export default function Sidebar({ onNewCheckIn }: SidebarProps) {
     { 
       icon: CalendarDays, 
       label: 'Agendamento', 
-      path: '/agendamento',
+      path: 'http://localhost:3000/agendamento-interno',
+      external: true,
       hidden: !spaceConfig?.perfilAgendamento && userData?.perfil !== 'administrador'
     },
     { icon: FileText, label: 'Relatórios', path: '/reports', hidden: !['coordenador', 'administrador'].includes(userData?.perfil || '') },
     { icon: SettingsIcon, label: 'Configurações', path: '/configuracoes' }
   ].filter(item => {
     if (item.hidden) return false;
-    return hasPermission(item.path);
+    return hasPermission(item.path) || item.external;
   });
 
   const [isOnline, setIsOnline] = useState(true);
@@ -97,6 +98,22 @@ export default function Sidebar({ onNewCheckIn }: SidebarProps) {
 
       <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
+          if (item.external) {
+            return (
+              <a
+                key={item.path}
+                href={item.path}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all group text-gray-500 hover:bg-gray-50 hover:text-gray-700"
+              >
+                <item.icon size={20} className="text-gray-400 group-hover:text-gray-600" />
+                <span>{item.label}</span>
+                <ExternalLink size={14} className="ml-auto opacity-50 group-hover:opacity-100 transition-opacity" />
+              </a>
+            );
+          }
+          
           const active = location.pathname === item.path || (location.pathname === '/' && item.path === '/painel');
           return (
             <Link
