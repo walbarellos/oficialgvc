@@ -116,35 +116,19 @@ export const agendamentoService = {
   },
 
   async getDashboardStats(espacoId?: string) {
-    let query = supabase
-      .from('agendamentos')
-      .select('status', { count: 'exact' });
-
-    if (espacoId) {
-      query = query.eq('espaco_id', espacoId);
+    const baseUrl = import.meta.env.VITE_GVC_API_URL || 'http://localhost:3000';
+    const query = espacoId ? `?espaco_id=${espacoId}` : '';
+  
+    try {
+      const res = await fetch(`${baseUrl}/api/public/agendamentos/stats${query}`);
+      if (!res.ok) {
+        return { data: null, error: { message: `Erro HTTP ${res.status}` } };
+      }
+      const data = await res.json();
+      return { data, error: null };
+    } catch (err: any) {
+      return { data: null, error: { message: err.message || 'Falha ao buscar estatísticas' } };
     }
-
-    const { data, error } = await query;
-    
-    if (error) return { data: null, error };
-
-    const stats: DashboardAgendamentos = {
-      total: 0,
-      pendentes: 0,
-      aprovados: 0,
-      rejeitados: 0,
-      cancelados: 0,
-    };
-
-    if (data) {
-      stats.total = data.length;
-      stats.pendentes = data.filter(d => d.status === 'pendente').length;
-      stats.aprovados = data.filter(d => d.status === 'aprovado').length;
-      stats.rejeitados = data.filter(d => d.status === 'rejeitado').length;
-      stats.cancelados = data.filter(d => d.status === 'cancelado').length;
-    }
-
-    return { data: stats, error: null };
   },
 
   async getConflitos(espacoId: string, data: string, inicio: string, fim: string, excludeId?: string) {
